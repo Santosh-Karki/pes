@@ -1,0 +1,12 @@
+.header {
+    margin-left: 20vw;
+    margin-right: 20vw;
+    background-color: white;
+    display: flex;
+    align-items: center;
+    min-width: fit-content;
+}
+
+.logo {
+    text-align: right;
+}

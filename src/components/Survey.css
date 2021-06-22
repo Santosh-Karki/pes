@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Karla&display=swap');
+
+.form{
+    height: 89.8vh;
+    margin-left: 20vw;
+    margin-right: 24.5vw;
+    display: flex;
+    background-color: #dfdfdf;;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-width: fit-content;
+}
+
+.form__font {
+    font-family: 'Karla';
+}
+
+.form__list {
+    margin-top: 2px;
+    width: 59vw;
+    text-align: left;
+}
+
+.form__item {
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    display: flex;
+}
+
+.form__header__font {
+    font-family: 'Work Sans', sans-serif;
+}
+
+.form__stack {
+    margin-left: 20px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-right: 20px;
+    display: flexbox;
+}
+
+.align__right {
+    text-align: right;
+    display: inherit;
+}
+
+.align__center {
+    text-align: center;
+    display: inherit;
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.reverse__color {
+    background-color: black;
+    color: white;
+}
+
+.thick {
+    height: 5vh;
+    vertical-align: middle;
+}
+
+.cancel__button {
+    outline: none;
+    border: none; 
+    background-color: white;
+    vertical-align: middle;
+}
+
+.fullwidth {
+    width: 100%;
+}
