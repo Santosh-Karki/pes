@@ -17,8 +17,8 @@ function Survey() {
     const [reload, setReload ] = useState(0)
 
     //VARIABLES
-    const surveyUrl = 'http://localhost:9000/graphql'
-    
+    const surveyUrl = process.env.REACT_APP_BACKEND_URL
+
     const reasons = [
         'Casual position holders', 
         'Health Assistants in Nursing (Trainees)', 
