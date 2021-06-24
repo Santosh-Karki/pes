@@ -1,13 +1,12 @@
 import {React, useEffect, useState} from 'react'
 import { useForm, Controller, useFieldArray } from "react-hook-form";
+import PropTypes from 'prop-types'
 import './Survey.css'
 import {GET_SURVEY, SUBMIT_SURVEY} from './common/Queries'
 import fontKarla from '../resources/karla-v14-latin-regular.woff2'
 import fontWorkSans from '../resources/WorkSans-VariableFont_wght.ttf'
 import { Alert, AlertTitle, Rating } from '@material-ui/lab';
-import {MenuItem, Paper, Select, Typography, FormControl, Grid, makeStyles, TextField, Button, Collapse, ThemeProvider, createMuiTheme} from '@material-ui/core'
-import CancelIcon from '@material-ui/icons/Cancel';
-import SearchIcon from '@material-ui/icons/Search';
+import {MenuItem, Paper, Select, Typography, FormControl, Grid, makeStyles, TextField, Button, Collapse, ThemeProvider, createMuiTheme, Card} from '@material-ui/core'
 
 function Survey() {
     //STATES
@@ -17,20 +16,8 @@ function Survey() {
     const [reload, setReload ] = useState(0)
 
     //VARIABLES
-    const surveyUrl = 'http://localhost:9000/graphql'
-    
-    const reasons = [
-        'Casual position holders', 
-        'Health Assistants in Nursing (Trainees)', 
-        'Honorary position holders',
-        'Long term illness or injury',
-        'Long term worker\'s compensation',
-        'Maternity leave',
-        'New Starters',
-        'Nurse bank & PSA bank',
-        'VMOs who are contracted for 0.2EFT or less',
-        'Other'
-    ]
+    const surveyUrl = 'https://ah-dev-pes-backend.azurewebsites.net/graphql'
+    const surveyId = 'B7AA42FE-BC98-45B8-986A-F7EEA0E0CF53'
 
     //STYLES
     const useStyles = makeStyles(theme => ({
@@ -60,6 +47,10 @@ function Survey() {
             marginLeft: '15px',
             marginRight: '15px',
             width: '97.8%'
+        },
+        ratingCard:{
+            margin: '15px',
+            textAlign: 'center'
         }
     }))
 
@@ -114,40 +105,98 @@ function Survey() {
     const classes = useStyles()
 
     //FUNCTIONS
+    function IconContainer(props) {
+        const { value, ...other } = props;
+        return <Card style={{paddingLeft: '10px', paddingRight: '10px', marginRight: '15px', marginLeft: '15px', textAlign: 'center', background: 'lightblue'}} {...other}>
+            <Typography  variant='h6'>{value - 1}</Typography>
+        </Card>
+    }
+
+    IconContainer.propTypes = {
+        value: PropTypes.number.isRequired,
+    };
+
     const submitAction = (data) => {
+        console.log(data)
+        const answers = data.surveyResponse 
+        let inputs = []
+        answers.dropdown.map((ans, index) => {
+            let temp = {}
+            temp.templateQuestionId = index
+            temp.typeId = 2
+            temp.ratingId = 0
+            temp.dropdownId = ans?.id
+            temp.text = null
+            inputs.push(temp)
+        })
+        answers.text.map((ans, index) => {
+            let temp = {}
+            temp.templateQuestionId = index
+            temp.typeId = 4
+            temp.ratingId = 0
+            temp.dropdownId = 0
+            temp.text = ans
+            inputs.push(temp)
+        })
+        answers.rating.map((ans, index) => {
+            let temp = {}
+            temp.templateQuestionId = index
+            temp.typeId = 3
+            surveyData.map(el => {
+                if(el.id == index) {
+                    el.ratings.map(rate => {
+                        if(rate.value == ans) {
+                            console.log('here')
+                            console.log(rate.id)
+                            temp.ratingId =  rate.id
+                        }
+                    })
+                }
+            })
+            temp.dropdownId = 0
+            temp.text =  null
+            inputs.push(temp)
+        })
+
+        console.log(inputs)
+
+        const reqBody = 
+        { 
+            surveyId: surveyId, 
+            inputs: inputs
+        }
+
+        console.log(SUBMIT_SURVEY(reqBody))
+
         fetch(surveyUrl, {
             headers: {
                 'Content-type': 'application/json',
                 'Allow-Cross-Remote-Origin': '*'
             },
             method: 'POST',
-            body: JSON.stringify({query: SUBMIT_SURVEY('F0D87428-5B4C-4241-ACDE-20B668FC7ED5', [])})
+            body: JSON.stringify({query: SUBMIT_SURVEY(reqBody), variables: JSON.stringify(reqBody)})
         })
         .then(res => res.json())
         .then(resData=> {
             console.log(resData)
+            if(resData.data.submitSurvey.status === "completed") {
+                setConfirmSuccess(true)
+            } else{
+                setConfirmError(true)
+            }
         })
-        .then(setConfirmSuccess(true))
     }
 
 
     //CONTROLS
     const { control, register, errors, handleSubmit, watch, setValue, getValues, reset } = useForm({
+        mode: "onChange",
         defaultValues: {
-            exemption: [{employeeID: "", employeeName: "", exemptionFor: "", effectiveDate: "", endDate: "", reason: "", employeeEmail: "", managerEmail: ""}]
+            surveyResponse: {surveyId: "", input: []}
         },
-        // resolver: yupResolver(validationSchema),
     });
 
-    const { fields, append, remove, insert } = useFieldArray(
-        {
-          control,
-          name: "exemption"
-        }
-    );
-
     //INIT
-    // console.log(JSON.stringify({query: GET_SURVEY('F0D87428-5B4C-4241-ACDE-20B668FC7ED5')}))
     //FETCH SURVEY DATA
     useEffect(() => {
         let isMounted = true
@@ -157,12 +206,12 @@ function Survey() {
                 'Allow-Cross-Remote-Origin': '*'
             },
             method: 'POST',
-            body: JSON.stringify({query: GET_SURVEY('F0D87428-5B4C-4241-ACDE-20B668FC7ED5')})
+            body: JSON.stringify({query: GET_SURVEY(surveyId)})
         })
         .then(res => res.json())
         .then(data=> {
-            console.log(data.data.survey.templateSurvey.templateQuestions)
-            setSurveyData(data.data.survey.templateSurvey.templateQuestions)
+            // console.log(data.data.survey.templateSurvey.templateQuestions)
+            setSurveyData(data?.data?.survey?.templateSurvey.templateQuestions)
         })
         return () => { isMounted = false }
     }, [reload])
@@ -171,103 +220,123 @@ function Survey() {
 
     return(
         <ThemeProvider theme={theme}>
-        <div className="form form__font">
+        {surveyData === undefined || surveyData === [] ? 
+            <Typography variant='h5'> Survey does not exist or already completed</Typography> :
+            <div className="form form__font">
             
-            <div className="form__list">
-                <Paper className={classes.paper} elevation={3}>
-                    <div className="form__item form__header__font">
-                        <Typography variant="h6"> 
-                            <b>Patient Experience Survey</b> 
-                        </Typography>
-                    </div>
-                </Paper>
-                
-                <form onSubmit={handleSubmit(submitAction)}>
+                <div className="form__list">
                     <Paper className={classes.paper} elevation={3}>
-                    {
-                        surveyData.map((row, index) => {
-                            
-                            return(
-                                <>
-                                    <div className="form__item thick">
-                                        <Grid container spacing={0}>
-                                            <Grid item xs={10}>
-                                                <Typography className='form__item' variant="body2">  {index + 1}. {row.title} </Typography>
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <FormControl fullWidth >
-                                                {
-                                                    row.type.type === "dropdown" ?
-                                                    <Controller
-                                                        as={
-                                                            <Select
-                                                                variant="outlined"
-                                                                className={classes.select}
-                                                                size="small"
-                                                            >
-                                                                {
-                                                                    row.dropdowns.map(pos => (
-                                                                    <MenuItem value={pos.title}> {pos.title} </MenuItem>
-                                                                    ))
-                                                                }
-                                                            </Select>
-                                                        }
-                                                        name={`surveyAnswer[${index}].${row.id}`}
-                                                        control={control}
-                                                        // defaultValue={`${item.exemptionFor}`}
-                                                    /> :
-                                                    undefined
-                                                }
-                                                {
-                                                    row.type.type === "text" ?
-                                                    <Controller
-                                                        as={<TextField label={row.title} variant="outlined" size="small" multiline fillWidth/>}
-                                                        name={`surveyAnswer[${index}].${row.id}`}
-                                                        control={control}
-                                                        // defaultValue={`${item.employeeID}`}
-                                                    /> :
-                                                    undefined
-                                                }
-                                                {
-                                                    row.type.type === "rating" ?
-                                                    <Controller
-                                                        as={<Rating max={row.ratings.length} />}
-                                                        name={`surveyAnswer[${index}].${row.id}`}
-                                                        control={control}
-                                                        // defaultValue={`${item.employeeID}`}
-                                                    /> :
-                                                    undefined 
-                                                }
-                                                </FormControl>
-                                            </Grid>
-                                        </Grid>
-                                    </div>
-                                    {/* <Typography variant="body2">{index + 1}. {row.title}</Typography> */}
-                                </>
-                            )
-                        })
-                    }
+                        <div className="form__item form__header__font">
+                            <Typography variant="h6"> 
+                                <b>Patient Experience Survey</b> 
+                            </Typography>
+                        </div>
                     </Paper>
-                    <div className="align__center">
-                        <Button className={classes.submitButton} variant="contained" color="primary" type="Submit">Submit Survey</Button>
-                    </div>
-                </form>
-                <Collapse in={confirmSuccess}>
-                    <Alert severity="success">
-                    <AlertTitle>Success</AlertTitle>
-                        Survey Submitted
-                    </Alert>
-                </Collapse>
+                    
+                    <form onSubmit={handleSubmit(submitAction)}>
+                        <Paper className={classes.paper} style={{paddingBottom: '15px'}} elevation={3}>
+                        <Typography className='form__item' style={{marginLeft: '15px'}} variant="body2">  Thinking about the recent inpatient admission in 'WARD_DESC', please complete this survey regarding your experience </Typography>
+                        {
+                            surveyData.map((row, index) => {
+                                
+                                return(
+                                    <>
+                                        <div className="form__item thick">
+                                            <Grid container spacing={0}>
+                                                <Grid item xs={10}>
+                                                    <Typography className='form__item' variant="body2">  {index + 1}. {row.title} </Typography>
+                                                </Grid>
+                                                <Grid item xs={12}>
+                                                    <FormControl fullWidth >
+                                                    {
+                                                        row.type.type === "dropdown" ?
+                                                        <Controller
+                                                            as={
+                                                                <Select
+                                                                    required
+                                                                    variant="outlined"
+                                                                    className={classes.select}
+                                                                    size="small"
+                                                                >
+                                                                    {
+                                                                        row.dropdowns.map(pos => (
+                                                                        <MenuItem value={pos}> {pos.title} </MenuItem>
+                                                                        ))
+                                                                    }
+                                                                </Select>
+                                                            }
+                                                            name={`surveyResponse.dropdown.${row.id}`}
+                                                            control={control}
+                                                        /> :
+                                                        undefined
+                                                    }
+                                                    {
+                                                        row.type.type === "text" ?
+                                                        <Controller
+                                                            as={<TextField 
+                                                                    ref={
+                                                                        register({
+                                                                            required: true
+                                                                        })
+                                                                    }
+                                                                    required
+                                                                    label={row.title} 
+                                                                    variant="outlined" 
+                                                                    size="small" 
+                                                                    multiline fillWidth
+                                                                />}
+                                                            name={`surveyResponse.text.${row.id}`}
+                                                            control={control}
+                                                        /> :
+                                                        undefined
+                                                    }
+                                                    {
+                                                        row.type.type === "rating" ?
+                                                        <Controller
+                                                            name={`surveyResponse.rating.${row.id}`}
+                                                            control={control}
+                                                            as={
+                                                                <Rating 
+                                                                    value={row.ratings.title} 
+                                                                    max={row.ratings.length}
+                                                                    IconContainerComponent={IconContainer}
+                                                                    fullWidth
+                                                                />
+                                                            }
+                                                        /> :
+                                                        undefined 
+                                                    }
+                                                    </FormControl>
+                                                </Grid>
+                                            </Grid>
+                                        </div>
+                                    </>
+                                )
+                            })
+                        }
+                        </Paper>
+                        <div className="align__center">
+                            <Button className={classes.submitButton} variant="contained" color="primary" type="Submit">Submit Survey</Button>
+                        </div>
+                    </form>
+                    <Collapse in={confirmSuccess}>
+                        <Alert severity="success">
+                        <AlertTitle>Success</AlertTitle>
+                            Survey Submitted
+                        </Alert>
+                    </Collapse>
 
-                <Collapse in={confirmError}>
-                    <Alert severity="error">
-                    <AlertTitle>Error</AlertTitle>
-                        Could not submit survey!
-                    </Alert>
-                </Collapse>
+                    <Collapse in={confirmError}>
+                        <Alert severity="error">
+                        <AlertTitle>Error</AlertTitle>
+                            Could not submit survey!
+                        </Alert>
+                    </Collapse>
+                </div>
+                
             </div>
-            
-        </div>
+        }
+        
          </ThemeProvider>
     )
 }

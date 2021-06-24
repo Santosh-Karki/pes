@@ -46,8 +46,8 @@ export const SUBMIT_SURVEY = ({
   inputs,
 }) => (
   `
-  mutation {
-    submitSurvey(surveyId: ${surveyId}, inputs: ${inputs}) {
+  mutation recordSurveyResponses($surveyId: ID!, $inputs: [UserResponseInput!]!) {
+    submitSurvey(surveyId: $surveyId, inputs: $inputs) {
       id
       dateCreated
       status
@@ -58,6 +58,10 @@ export const SUBMIT_SURVEY = ({
           id
           type
           status
+        }
+        templateQuestion {
+          id
+          title               
         }
         rating {
           id
