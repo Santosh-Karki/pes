@@ -16,8 +16,8 @@ function Survey() {
     const [reload, setReload ] = useState(0)
 
     //VARIABLES
-    const surveyUrl = 'https://ah-dev-pes-backend.azurewebsites.net/graphql'
     const surveyId = 'B7AA42FE-BC98-45B8-986A-F7EEA0E0CF53'
+    const surveyUrl = process.env.REACT_APP_BACKEND_URL
 
     //STYLES
     const useStyles = makeStyles(theme => ({
