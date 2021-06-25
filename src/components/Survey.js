@@ -1,21 +1,24 @@
-import {React, useEffect, useState} from 'react'
-import {useMediaQuery} from 'react-responsive'
+import { React, useEffect, useState } from 'react'
+import { useMediaQuery } from 'react-responsive'
 import { useForm, Controller, useFieldArray } from "react-hook-form";
-import {useLocation}  from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types'
 import './Survey.css'
-import {GET_SURVEY, SUBMIT_SURVEY} from './common/Queries'
+import { GET_SURVEY, SUBMIT_SURVEY, AUTHENTICATE } from './common/Queries'
 import fontKarla from '../resources/karla-v14-latin-regular.woff2'
 import fontWorkSans from '../resources/WorkSans-VariableFont_wght.ttf'
 import { Alert, AlertTitle, Rating } from '@material-ui/lab';
-import {MenuItem, Paper, Select, Typography, FormControl, Grid, makeStyles, TextField, Button, Collapse, ThemeProvider, createMuiTheme, Card} from '@material-ui/core'
+import { MenuItem, Paper, Select, Typography, FormControl, Grid, makeStyles, TextField, Button, Collapse, ThemeProvider, createMuiTheme, Card } from '@material-ui/core'
+import useToken from './common/useToken';
 
 function Survey() {
+    const { token, setToken } = useToken();
+
     //STATES
-    const [confirmSuccess, setConfirmSuccess] = useState(false) 
-    const [confirmError, setConfirmError] = useState(false) 
+    const [confirmSuccess, setConfirmSuccess] = useState(false)
+    const [confirmError, setConfirmError] = useState(false)
     const [surveyData, setSurveyData] = useState([])
-    const [reload, setReload ] = useState(0)
+    const [reload, setReload] = useState(0)
 
     //VARIABLES
     const location = useLocation();
@@ -45,7 +48,7 @@ function Survey() {
             color: 'red',
             backgroundColor: 'white',
             outlineWidth: 0,
-            alignItems : 'right',
+            alignItems: 'right',
             // display: 'flex',
             verticalAlign: 'center'
         },
@@ -54,7 +57,7 @@ function Survey() {
             marginRight: '15px',
             width: '97.8%'
         },
-        ratingCard:{
+        ratingCard: {
             margin: '15px',
             textAlign: 'center'
         },
@@ -68,7 +71,7 @@ function Survey() {
             // overflow-x: hidden;
             minWidth: 'fitContent',
         },
-        formItem:{
+        formItem: {
             marginLeft: '20px',
             marginRight: '20px',
             marginTop: '10px',
@@ -113,21 +116,21 @@ function Survey() {
         typography: {
             fontFamily: 'Karla',
         },
-        h6:{
+        h6: {
             fontFamily: 'WorkSans'
         }
     });
 
     const headerTheme = createMuiTheme({
         typography: {
-          fontFamily: 'WorkSans',
+            fontFamily: 'WorkSans',
         },
         overrides: {
-          MuiCssBaseline: {
-            '@global': {
-              '@font-face': [workSans],
+            MuiCssBaseline: {
+                '@global': {
+                    '@font-face': [workSans],
+                },
             },
-          },
         },
     });
 
@@ -137,23 +140,23 @@ function Survey() {
     function IconContainer(props) {
         const { value, ...other } = props;
         return (
-            
+
             isTabletOrMobile ?
-            <Grid container spacing={20}>
-                <Grid item xs={20}>
-                    <Card style={{paddingLeft: '10px', paddingRight: '10px', marginRight: '1px', marginLeft: '1px', textAlign: 'center', background: 'lightgrey'}} {...other}>
-                        <Typography  variant='h6'>{value - 1}</Typography>
-                    </Card>
+                <Grid container spacing={20}>
+                    <Grid item xs={20}>
+                        <Card style={{ paddingLeft: '10px', paddingRight: '10px', marginRight: '1px', marginLeft: '1px', textAlign: 'center', background: 'lightgrey' }} {...other}>
+                            <Typography variant='h6'>{value - 1}</Typography>
+                        </Card>
+                    </Grid>
+                </Grid> :
+                <Grid container spacing={20}>
+                    <Grid item xs={20}>
+                        <Card style={{ paddingLeft: '10px', paddingRight: '10px', marginRight: '5px', marginLeft: '5px', textAlign: 'center', background: 'lightgrey' }} {...other}>
+                            <Typography variant='h6'>{value - 1}</Typography>
+                        </Card>
+                    </Grid>
                 </Grid>
-            </Grid> :
-            <Grid container spacing={20}>
-                <Grid item xs={20}>
-                    <Card style={{paddingLeft: '10px', paddingRight: '10px', marginRight: '5px', marginLeft: '5px', textAlign: 'center', background: 'lightgrey'}} {...other}>
-                        <Typography  variant='h6'>{value - 1}</Typography>
-                    </Card>
-                </Grid>
-            </Grid>
-            
+
         )
     }
 
@@ -163,7 +166,7 @@ function Survey() {
 
     const submitAction = (data) => {
         console.log(data)
-        const answers = data.surveyResponse 
+        const answers = data.surveyResponse
         let inputs = []
         answers.dropdown.map((ans, index) => {
             let temp = {}
@@ -188,26 +191,26 @@ function Survey() {
             temp.templateQuestionId = index
             temp.typeId = 3
             surveyData.map(el => {
-                if(el.id == index) {
+                if (el.id == index) {
                     el.ratings.map(rate => {
-                        if(rate.value == ans) {
+                        if (rate.value == ans) {
                             console.log('here')
                             console.log(rate.id)
-                            temp.ratingId =  rate.id
+                            temp.ratingId = rate.id
                         }
                     })
                 }
             })
             temp.dropdownId = 0
-            temp.text =  null
+            temp.text = null
             inputs.push(temp)
         })
 
         console.log(inputs)
 
-        const reqBody = 
-        { 
-            surveyId: surveyId, 
+        const reqBody =
+        {
+            surveyId: surveyId,
             inputs: inputs
         }
 
@@ -216,20 +219,21 @@ function Survey() {
         fetch(surveyUrl, {
             headers: {
                 'Content-type': 'application/json',
-                'Allow-Cross-Remote-Origin': '*'
+                'Allow-Cross-Remote-Origin': '*',
+                'authentication': token
             },
             method: 'POST',
-            body: JSON.stringify({query: SUBMIT_SURVEY(reqBody), variables: JSON.stringify(reqBody)})
+            body: JSON.stringify({ query: SUBMIT_SURVEY(reqBody), variables: JSON.stringify(reqBody) })
         })
-        .then(res => res.json())
-        .then(resData=> {
-            console.log(resData)
-            if(resData.data.submitSurvey.status === "completed") {
-                setConfirmSuccess(true)
-            } else{
-                setConfirmError(true)
-            }
-        })
+            .then(res => res.json())
+            .then(resData => {
+                console.log(resData)
+                if (resData.data.submitSurvey.status === "completed") {
+                    setConfirmSuccess(true)
+                } else {
+                    setConfirmError(true)
+                }
+            })
     }
 
 
@@ -237,152 +241,180 @@ function Survey() {
     const { control, register, errors, handleSubmit, watch, setValue, getValues, reset } = useForm({
         mode: "onChange",
         defaultValues: {
-            surveyResponse: {surveyId: "", input: []}
+            surveyResponse: { surveyId: "", input: [] }
         },
     });
 
-    //INIT
-    //FETCH SURVEY DATA
-    useEffect(() => {
-        let isMounted = true
+    const authenticate = () => {
         fetch(surveyUrl, {
             headers: {
                 'Content-type': 'application/json',
                 'Allow-Cross-Remote-Origin': '*'
             },
             method: 'POST',
-            body: JSON.stringify({query: GET_SURVEY(surveyId)})
+            body: JSON.stringify({ query: AUTHENTICATE(surveyId) })
         })
-        .then(res => res.json())
-        .then(data=> {
-            // console.log(data.data.survey.templateSurvey.templateQuestions)
-            setSurveyData(data?.data?.survey?.templateSurvey.templateQuestions)
+            .then(res => res.json())
+            .then(data => {
+                setToken(data?.data?.authenticate)
+            })
+    }
+
+    const loadSurveyQuestion = () => {
+        let isMounted = true
+        fetch(surveyUrl, {
+            headers: {
+                'Content-type': 'application/json',
+                'Allow-Cross-Remote-Origin': '*',
+                'authentication': token
+            },
+            method: 'POST',
+            body: JSON.stringify({
+                query: GET_SURVEY(surveyId)
+            })
         })
+            .then(res => res.json())
+            .then(data => {
+                // console.log(data.data.survey.templateSurvey.templateQuestions)
+                setSurveyData(data?.data?.survey?.templateSurvey.templateQuestions)
+            })
         return () => { isMounted = false }
-    }, [reload])
+    }
+
+    //INIT
+    //FETCH SURVEY DATA
+    useEffect(() => {
+        if (!token) {
+            authenticate()
+        }
+
+        if (token) {
+            loadSurveyQuestion()
+        }
+    }, [token])
 
     console.log(surveyData)
 
-    return(
+    return (
         <ThemeProvider theme={theme}>
-        {surveyData === undefined || surveyData === [] ? 
-            <Typography variant='h5'> Survey does not exist or already completed</Typography> :
-            <div className={isTabletOrMobile? "mobile__form form__font" : "form form__font"}>
-            
-                <div className={classes.formList}>
-                    <Paper className={classes.paper} elevation={3}>
-                        <div className={classes.formItem}>
-                            <Typography variant="h6"> 
-                                <b>Patient Experience Survey</b> 
-                            </Typography>
-                        </div>
-                    </Paper>
-                    
-                    <form onSubmit={handleSubmit(submitAction)}>
-                        <Paper className={classes.paper} style={{paddingTop: '10px', paddingBottom: '25px'}} elevation={3}>
-                        <Typography className={classes.formItem} style={{marginLeft: '15px'}} variant="body2">  Thinking about the recent inpatient admission in 'WARD_DESC', please complete this survey regarding your experience </Typography>
-                        {
-                            surveyData.map((row, index) => {
-                                
-                                return(
-                                    <>
-                                        <div className={classes.formItem} style={{ height: '5vh', verticalAlign: 'middle'}}>
-                                            <Grid container spacing={0}>
-                                                <Grid item xs={12}>
-                                                    <Typography className={classes.formItem} variant="body2">  {index + 1}. {row.title} </Typography>
-                                                </Grid>
-                                                <Grid item xs={12}>
-                                                    <FormControl fullWidth >
-                                                    {
-                                                        row.type.type === "dropdown" ?
-                                                        <Controller
-                                                            as={
-                                                                <Select
-                                                                    required
-                                                                    variant="outlined"
-                                                                    className={classes.select}
-                                                                    size="small"
-                                                                >
-                                                                    {
-                                                                        row.dropdowns.map(pos => (
-                                                                        <MenuItem value={pos}> {pos.title} </MenuItem>
-                                                                        ))
-                                                                    }
-                                                                </Select>
-                                                            }
-                                                            name={`surveyResponse.dropdown.${row.id}`}
-                                                            control={control}
-                                                        /> :
-                                                        undefined
-                                                    }
-                                                    {
-                                                        row.type.type === "text" ?
-                                                        <Controller
-                                                            as={<TextField 
-                                                                    ref={
-                                                                        register({
-                                                                            required: true
-                                                                        })
-                                                                    }
-                                                                    required
-                                                                    label={row.title} 
-                                                                    variant="outlined" 
-                                                                    size="small" 
-                                                                    multiline fillWidth
-                                                                />}
-                                                            name={`surveyResponse.text.${row.id}`}
-                                                            control={control}
-                                                        /> :
-                                                        undefined
-                                                    }
-                                                    {
-                                                        row.type.type === "rating" ?
-                                                        <Controller
-                                                            name={`surveyResponse.rating.${row.id}`}
-                                                            control={control}
-                                                            as={
-                                                                <Rating 
-                                                                    value={row.ratings.title} 
-                                                                    max={row.ratings.length}
-                                                                    IconContainerComponent={IconContainer}
-                                                                    fullWidth
-                                                                />
-                                                            }
-                                                        /> :
-                                                        undefined 
-                                                    }
-                                                    </FormControl>
-                                                </Grid>
-                                            </Grid>
-                                        </div>
-                                    </>
-                                )
-                            })
-                        }
-                        </Paper>
-                        <div className="align__center">
-                            <Button className={classes.submitButton} variant="contained" color="primary" type="Submit">Submit Survey</Button>
-                        </div>
-                    </form>
-                    <Collapse in={confirmSuccess}>
-                        <Alert severity="success">
-                        <AlertTitle>Success</AlertTitle>
-                            Survey Submitted
-                        </Alert>
-                    </Collapse>
+            {surveyData === undefined || surveyData === [] ?
+                <Typography variant='h5'> Survey does not exist or already completed</Typography> :
+                <div className={isTabletOrMobile ? "mobile__form form__font" : "form form__font"}>
 
-                    <Collapse in={confirmError}>
-                        <Alert severity="error">
-                        <AlertTitle>Error</AlertTitle>
-                            Could not submit survey!
-                        </Alert>
-                    </Collapse>
+                    <div className={classes.formList}>
+                        <Paper className={classes.paper} elevation={3}>
+                            <div className={classes.formItem}>
+                                <Typography variant="h6">
+                                    <b>Patient Experience Survey</b>
+                                </Typography>
+                            </div>
+                        </Paper>
+
+                        <form onSubmit={handleSubmit(submitAction)}>
+                            <Paper className={classes.paper} style={{ paddingTop: '10px', paddingBottom: '25px' }} elevation={3}>
+                                <Typography className={classes.formItem} style={{ marginLeft: '15px' }} variant="body2">  Thinking about the recent inpatient admission in 'WARD_DESC', please complete this survey regarding your experience </Typography>
+                                {
+                                    surveyData.map((row, index) => {
+
+                                        return (
+                                            <>
+                                                <div className={classes.formItem} style={{ height: '5vh', verticalAlign: 'middle' }}>
+                                                    <Grid container spacing={0}>
+                                                        <Grid item xs={12}>
+                                                            <Typography className={classes.formItem} variant="body2">  {index + 1}. {row.title} </Typography>
+                                                        </Grid>
+                                                        <Grid item xs={12}>
+                                                            <FormControl fullWidth >
+                                                                {
+                                                                    row.type.type === "dropdown" ?
+                                                                        <Controller
+                                                                            as={
+                                                                                <Select
+                                                                                    required
+                                                                                    variant="outlined"
+                                                                                    className={classes.select}
+                                                                                    size="small"
+                                                                                >
+                                                                                    {
+                                                                                        row.dropdowns.map(pos => (
+                                                                                            <MenuItem value={pos}> {pos.title} </MenuItem>
+                                                                                        ))
+                                                                                    }
+                                                                                </Select>
+                                                                            }
+                                                                            name={`surveyResponse.dropdown.${row.id}`}
+                                                                            control={control}
+                                                                        /> :
+                                                                        undefined
+                                                                }
+                                                                {
+                                                                    row.type.type === "text" ?
+                                                                        <Controller
+                                                                            as={<TextField
+                                                                                ref={
+                                                                                    register({
+                                                                                        required: true
+                                                                                    })
+                                                                                }
+                                                                                required
+                                                                                label={row.title}
+                                                                                variant="outlined"
+                                                                                size="small"
+                                                                                multiline fillWidth
+                                                                            />}
+                                                                            name={`surveyResponse.text.${row.id}`}
+                                                                            control={control}
+                                                                        /> :
+                                                                        undefined
+                                                                }
+                                                                {
+                                                                    row.type.type === "rating" ?
+                                                                        <Controller
+                                                                            name={`surveyResponse.rating.${row.id}`}
+                                                                            control={control}
+                                                                            as={
+                                                                                <Rating
+                                                                                    value={row.ratings.title}
+                                                                                    max={row.ratings.length}
+                                                                                    IconContainerComponent={IconContainer}
+                                                                                    fullWidth
+                                                                                />
+                                                                            }
+                                                                        /> :
+                                                                        undefined
+                                                                }
+                                                            </FormControl>
+                                                        </Grid>
+                                                    </Grid>
+                                                </div>
+                                            </>
+                                        )
+                                    })
+                                }
+                            </Paper>
+                            <div className="align__center">
+                                <Button className={classes.submitButton} variant="contained" color="primary" type="Submit">Submit Survey</Button>
+                            </div>
+                        </form>
+                        <Collapse in={confirmSuccess}>
+                            <Alert severity="success">
+                                <AlertTitle>Success</AlertTitle>
+                                Survey Submitted
+                            </Alert>
+                        </Collapse>
+
+                        <Collapse in={confirmError}>
+                            <Alert severity="error">
+                                <AlertTitle>Error</AlertTitle>
+                                Could not submit survey!
+                            </Alert>
+                        </Collapse>
+                    </div>
+
                 </div>
-                
-            </div>
-        }
-        
-         </ThemeProvider>
+            }
+
+        </ThemeProvider>
     )
 }
 

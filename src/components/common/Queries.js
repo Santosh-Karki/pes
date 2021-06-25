@@ -81,5 +81,8 @@ export const SUBMIT_SURVEY = ({
   `
 )
 
-
-
+export const AUTHENTICATE = (id) => (`
+  mutation {
+    authenticate(id: "${id}")
+  }`
+)
