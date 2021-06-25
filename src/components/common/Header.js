@@ -1,4 +1,5 @@
 import React from 'react'
+import {useMediaQuery} from 'react-responsive'
 import './Header.css'
 import logo from '../../resources/logo.jpg'
 import banner from '../../resources/header.jpeg'
@@ -12,14 +13,19 @@ function Header() {
     }))
 
     const classes = useStyles()
+    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
 
     return(
-        <div className="header">
-            {/* <Paper className={classes.paper} elevation={3}> */}
+        isTabletOrMobile ?
+        <div className="mobile__header">
                 <div className={classes.paper} >
                     <img src={banner} alt="Austin logo" width="100%" height="100%"/>
                 </div>
-            {/* </Paper> */}
+        </div> :
+        <div className="header">
+                <div className={classes.paper} >
+                    <img src={banner} alt="Austin logo" width="100%" height="100%"/>
+                </div>
         </div>
     )
 }

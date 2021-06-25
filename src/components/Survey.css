@@ -4,11 +4,20 @@
 .form{
     height: 89.8vh;
     margin-left: 20vw;
-    margin-right: 24.5vw;
+    margin-right: 20vw;
     display: flex;
     background-color: #dfdfdf;;
     overflow-y: auto;
     overflow-x: hidden;
+    min-width: fit-content;
+}
+
+.mobile__form{
+    height: 89.8vh;
+    display: flex;
+    background-color: #dfdfdf;;
+    overflow-y: auto;
+    /* overflow-x: hidden; */
     min-width: fit-content;
 }
 

@@ -1,4 +1,5 @@
 import {React, useEffect, useState} from 'react'
+import {useMediaQuery} from 'react-responsive'
 import { useForm, Controller, useFieldArray } from "react-hook-form";
 import {useLocation}  from 'react-router-dom';
 import PropTypes from 'prop-types'
@@ -18,6 +19,7 @@ function Survey() {
 
     //VARIABLES
     const location = useLocation();
+    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
     const surveyId = new URLSearchParams(location.search).get('surveyId')
     const surveyUrl = process.env.REACT_APP_BACKEND_URL
     // const surveyUrl = 'https://ah-dev-pes-backend.azurewebsites.net/graphql'
@@ -26,8 +28,9 @@ function Survey() {
     const useStyles = makeStyles(theme => ({
         select: {
             height: 35,
-            minWidth: '100%',
-            maxWidth: 1000
+            // minWidth: '100%',
+            // maxWidth: 1000,
+            // display: 'flex'
         },
         fillWidth: {
             minWidth: '100%',
@@ -43,7 +46,7 @@ function Survey() {
             backgroundColor: 'white',
             outlineWidth: 0,
             alignItems : 'right',
-            display: 'flex',
+            // display: 'flex',
             verticalAlign: 'center'
         },
         submitButton: {
@@ -54,6 +57,29 @@ function Survey() {
         ratingCard:{
             margin: '15px',
             textAlign: 'center'
+        },
+        formMain: {
+            height: '89.8vh',
+            marginLeft: '20vw',
+            marginRight: '24.5vw',
+            display: 'flex',
+            backgroundColor: '#dfdfdf',
+            // overflow-y: auto;
+            // overflow-x: hidden;
+            minWidth: 'fitContent',
+        },
+        formItem:{
+            marginLeft: '20px',
+            marginRight: '20px',
+            marginTop: '10px',
+            marginBottom: '10px',
+            // display: 'flex'
+        },
+        formList: {
+            marginTop: '2px',
+            width: '100%',
+            textAlign: 'left',
+            // display: 'flex'
         }
     }))
 
@@ -110,9 +136,25 @@ function Survey() {
     //FUNCTIONS
     function IconContainer(props) {
         const { value, ...other } = props;
-        return <Card style={{paddingLeft: '10px', paddingRight: '10px', marginRight: '15px', marginLeft: '15px', textAlign: 'center', background: 'lightblue'}} {...other}>
-            <Typography  variant='h6'>{value - 1}</Typography>
-        </Card>
+        return (
+            
+            isTabletOrMobile ?
+            <Grid container spacing={20}>
+                <Grid item xs={20}>
+                    <Card style={{paddingLeft: '10px', paddingRight: '10px', marginRight: '1px', marginLeft: '1px', textAlign: 'center', background: 'lightgrey'}} {...other}>
+                        <Typography  variant='h6'>{value - 1}</Typography>
+                    </Card>
+                </Grid>
+            </Grid> :
+            <Grid container spacing={20}>
+                <Grid item xs={20}>
+                    <Card style={{paddingLeft: '10px', paddingRight: '10px', marginRight: '5px', marginLeft: '5px', textAlign: 'center', background: 'lightgrey'}} {...other}>
+                        <Typography  variant='h6'>{value - 1}</Typography>
+                    </Card>
+                </Grid>
+            </Grid>
+            
+        )
     }
 
     IconContainer.propTypes = {
@@ -225,11 +267,11 @@ function Survey() {
         <ThemeProvider theme={theme}>
         {surveyData === undefined || surveyData === [] ? 
             <Typography variant='h5'> Survey does not exist or already completed</Typography> :
-            <div className="form form__font">
+            <div className={isTabletOrMobile? "mobile__form form__font" : "form form__font"}>
             
-                <div className="form__list">
+                <div className={classes.formList}>
                     <Paper className={classes.paper} elevation={3}>
-                        <div className="form__item form__header__font">
+                        <div className={classes.formItem}>
                             <Typography variant="h6"> 
                                 <b>Patient Experience Survey</b> 
                             </Typography>
@@ -238,16 +280,16 @@ function Survey() {
                     
                     <form onSubmit={handleSubmit(submitAction)}>
                         <Paper className={classes.paper} style={{paddingTop: '10px', paddingBottom: '25px'}} elevation={3}>
-                        <Typography className='form__item' style={{marginLeft: '15px'}} variant="body2">  Thinking about the recent inpatient admission in 'WARD_DESC', please complete this survey regarding your experience </Typography>
+                        <Typography className={classes.formItem} style={{marginLeft: '15px'}} variant="body2">  Thinking about the recent inpatient admission in 'WARD_DESC', please complete this survey regarding your experience </Typography>
                         {
                             surveyData.map((row, index) => {
                                 
                                 return(
                                     <>
-                                        <div className="form__item thick">
+                                        <div className={classes.formItem} style={{ height: '5vh', verticalAlign: 'middle'}}>
                                             <Grid container spacing={0}>
-                                                <Grid item xs={10}>
-                                                    <Typography className='form__item' variant="body2">  {index + 1}. {row.title} </Typography>
+                                                <Grid item xs={12}>
+                                                    <Typography className={classes.formItem} variant="body2">  {index + 1}. {row.title} </Typography>
                                                 </Grid>
                                                 <Grid item xs={12}>
                                                     <FormControl fullWidth >
