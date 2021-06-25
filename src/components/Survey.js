@@ -1,5 +1,6 @@
 import {React, useEffect, useState} from 'react'
 import { useForm, Controller, useFieldArray } from "react-hook-form";
+import {useLocation}  from 'react-router-dom';
 import PropTypes from 'prop-types'
 import './Survey.css'
 import {GET_SURVEY, SUBMIT_SURVEY} from './common/Queries'
@@ -16,8 +17,10 @@ function Survey() {
     const [reload, setReload ] = useState(0)
 
     //VARIABLES
-    const surveyId = 'B7AA42FE-BC98-45B8-986A-F7EEA0E0CF53'
+    const location = useLocation();
+    const surveyId = new URLSearchParams(location.search).get('surveyId')
     const surveyUrl = process.env.REACT_APP_BACKEND_URL
+    // const surveyUrl = 'https://ah-dev-pes-backend.azurewebsites.net/graphql'
 
     //STYLES
     const useStyles = makeStyles(theme => ({
@@ -234,7 +237,7 @@ function Survey() {
                     </Paper>
                     
                     <form onSubmit={handleSubmit(submitAction)}>
-                        <Paper className={classes.paper} style={{paddingBottom: '15px'}} elevation={3}>
+                        <Paper className={classes.paper} style={{paddingTop: '10px', paddingBottom: '25px'}} elevation={3}>
                         <Typography className='form__item' style={{marginLeft: '15px'}} variant="body2">  Thinking about the recent inpatient admission in 'WARD_DESC', please complete this survey regarding your experience </Typography>
                         {
                             surveyData.map((row, index) => {
