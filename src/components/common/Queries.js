@@ -4,6 +4,10 @@ export const GET_SURVEY = (id) => `
     id
     dateCreated
     status
+    responses {
+      id
+      text
+    }
     templateSurvey {
       id
       title

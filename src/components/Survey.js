@@ -19,15 +19,17 @@ function Survey() {
     const [confirmSuccess, setConfirmSuccess] = useState(false)
     const [confirmError, setConfirmError] = useState(false)
     const [surveyData, setSurveyData] = useState([])
+    const [ward, setWard] = useState('')
+    const [loc, setLoc] = useState('')
     const [reload, setReload] = useState(0)
     const [surveyId, setSurveyId] = useState(new URLSearchParams(location.search).get('surveyId'))
 
     //VARIABLES
-
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
     //const surveyId = new URLSearchParams(location.search).get('surveyId')
     const surveyUrl = process.env.REACT_APP_BACKEND_URL
     // const surveyUrl = 'https://ah-dev-pes-backend.azurewebsites.net/graphql'
+    let questNo = 0
 
     //STYLES
     const useStyles = makeStyles(theme => ({
@@ -217,6 +219,7 @@ function Survey() {
         }
 
         console.log(SUBMIT_SURVEY(reqBody))
+        console.log(reqBody)
 
         fetch(surveyUrl, {
             headers: {
@@ -230,7 +233,7 @@ function Survey() {
             .then(res => res.json())
             .then(resData => {
                 console.log(resData)
-                if (resData.data.submitSurvey.status === "completed") {
+                if (resData?.data?.submitSurvey?.status === "completed") {
                     setConfirmSuccess(true)
                 } else {
                     setConfirmError(true)
@@ -281,8 +284,12 @@ function Survey() {
             .then(res => res.json())
             .then(data => {
                 if (data?.errors?.length > 0) throw new Error(data?.errors[0].message)
-
+                console.log(data?.data?.survey)
                 setSurveyData(data?.data?.survey?.templateSurvey.templateQuestions)
+                setWard(data?.data?.survey?.responses[0].text)
+                // setLoc(data?.data?.survey?.templateSurvey.templateQuestions.find(el => {
+                //     el.title === "CT Loc"
+                // }))
             })
     }
 
@@ -300,7 +307,7 @@ function Survey() {
         return () => { isMounted = false }
     }, [])
 
-    console.log(surveyData)
+    // console.log(surveyData)
 
     return (
         <ThemeProvider theme={theme}>
@@ -319,83 +326,85 @@ function Survey() {
 
                         <form onSubmit={handleSubmit(submitAction)}>
                             <Paper className={classes.paper} style={{ paddingTop: '10px', paddingBottom: '25px' }} elevation={3}>
-                                <Typography className={classes.formItem} style={{ marginLeft: '15px' }} variant="body2">  Thinking about the recent inpatient admission in 'WARD_DESC', please complete this survey regarding your experience </Typography>
+                                <Typography className={classes.formItem} style={{ marginLeft: '15px' }} variant="body2">  {`Thinking about the recent inpatient admission in '${ward}', please complete this survey regarding your experience`} </Typography>
                                 {
-                                    surveyData.map((row, index) => {
-
-                                        return (
-                                            <>
-                                                <div className={classes.formItem} style={{ height: '5vh', verticalAlign: 'middle' }}>
-                                                    <Grid container spacing={0}>
-                                                        <Grid item xs={12}>
-                                                            <Typography className={classes.formItem} variant="body2">  {index + 1}. {row.title} </Typography>
-                                                        </Grid>
-                                                        <Grid item xs={12}>
-                                                            <FormControl fullWidth >
-                                                                {
-                                                                    row.type.type === "dropdown" ?
-                                                                        <Controller
-                                                                            as={
-                                                                                <Select
-                                                                                    required
-                                                                                    variant="outlined"
-                                                                                    className={classes.select}
-                                                                                    size="small"
-                                                                                >
-                                                                                    {
-                                                                                        row.dropdowns.map(pos => (
-                                                                                            <MenuItem value={pos}> {pos.title} </MenuItem>
-                                                                                        ))
-                                                                                    }
-                                                                                </Select>
-                                                                            }
-                                                                            name={`surveyResponse.dropdown.${row.id}`}
-                                                                            control={control}
-                                                                        /> :
-                                                                        undefined
-                                                                }
-                                                                {
-                                                                    row.type.type === "text" ?
-                                                                        <Controller
-                                                                            as={<TextField
-                                                                                ref={
-                                                                                    register({
-                                                                                        required: true
-                                                                                    })
+                                    surveyData.map((row) => {
+                                        if (row.status !== "hidden"){
+                                            questNo++
+                                            return (
+                                                <>
+                                                    <div className={classes.formItem} style={{ height: '5vh', verticalAlign: 'middle' }}>
+                                                        <Grid container spacing={0}>
+                                                            <Grid item xs={12}>
+                                                                <Typography className={classes.formItem} variant="body2">  {questNo}. {row.title} </Typography>
+                                                            </Grid>
+                                                            <Grid item xs={12}>
+                                                                <FormControl fullWidth >
+                                                                    {
+                                                                        row.type.type === "dropdown" ?
+                                                                            <Controller
+                                                                                as={
+                                                                                    <Select
+                                                                                        required
+                                                                                        variant="outlined"
+                                                                                        className={classes.select}
+                                                                                        size="small"
+                                                                                    >
+                                                                                        {
+                                                                                            row.dropdowns.map(pos => (
+                                                                                                <MenuItem value={pos}> {pos.title} </MenuItem>
+                                                                                            ))
+                                                                                        }
+                                                                                    </Select>
                                                                                 }
-                                                                                required
-                                                                                label={row.title}
-                                                                                variant="outlined"
-                                                                                size="small"
-                                                                                multiline fillWidth
-                                                                            />}
-                                                                            name={`surveyResponse.text.${row.id}`}
-                                                                            control={control}
-                                                                        /> :
-                                                                        undefined
-                                                                }
-                                                                {
-                                                                    row.type.type === "rating" ?
-                                                                        <Controller
-                                                                            name={`surveyResponse.rating.${row.id}`}
-                                                                            control={control}
-                                                                            as={
-                                                                                <Rating
-                                                                                    value={row.ratings.title}
-                                                                                    max={row.ratings.length}
-                                                                                    IconContainerComponent={IconContainer}
-                                                                                    fullWidth
-                                                                                />
-                                                                            }
-                                                                        /> :
-                                                                        undefined
-                                                                }
-                                                            </FormControl>
+                                                                                name={`surveyResponse.dropdown.${row.id}`}
+                                                                                control={control}
+                                                                            /> :
+                                                                            undefined
+                                                                    }
+                                                                    {
+                                                                        row.type.type === "text" ?
+                                                                            <Controller
+                                                                                as={<TextField
+                                                                                    ref={
+                                                                                        register({
+                                                                                            required: true
+                                                                                        })
+                                                                                    }
+                                                                                    required
+                                                                                    label={row.title}
+                                                                                    variant="outlined"
+                                                                                    size="small"
+                                                                                    multiline fillWidth
+                                                                                />}
+                                                                                name={`surveyResponse.text.${row.id}`}
+                                                                                control={control}
+                                                                            /> :
+                                                                            undefined
+                                                                    }
+                                                                    {
+                                                                        row.type.type === "rating" ?
+                                                                            <Controller
+                                                                                name={`surveyResponse.rating.${row.id}`}
+                                                                                control={control}
+                                                                                as={
+                                                                                    <Rating
+                                                                                        value={row.ratings.title}
+                                                                                        max={row.ratings.length}
+                                                                                        IconContainerComponent={IconContainer}
+                                                                                        fullWidth
+                                                                                    />
+                                                                                }
+                                                                            /> :
+                                                                            undefined
+                                                                    }
+                                                                </FormControl>
+                                                            </Grid>
                                                         </Grid>
-                                                    </Grid>
-                                                </div>
-                                            </>
-                                        )
+                                                    </div>
+                                                </>
+                                            )
+                                        }
                                     })
                                 }
                             </Paper>
