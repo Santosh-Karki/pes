@@ -45,6 +45,16 @@ export const GET_SURVEY = (id) => `
 }
 `
 
+export const GET_WARD = (id) => 
+`
+query{
+  wardResponse(surveyId: "${id}", title: "ward"){
+    id
+    text
+  }
+}
+`
+
 export const SUBMIT_SURVEY = ({
   surveyId,
   inputs,

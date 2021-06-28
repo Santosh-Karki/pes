@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types'
 import './Survey.css'
 import ThankYou from './ThankYou'
-import { GET_SURVEY, SUBMIT_SURVEY, AUTHENTICATE } from './common/Queries'
+import { GET_SURVEY, SUBMIT_SURVEY, AUTHENTICATE, GET_WARD } from './common/Queries'
 import fontKarla from '../resources/karla-v14-latin-regular.woff2'
 import fontWorkSans from '../resources/WorkSans-VariableFont_wght.ttf'
 import { Alert, AlertTitle, Rating } from '@material-ui/lab';
@@ -22,6 +22,7 @@ function Survey() {
     const [surveyData, setSurveyData] = useState([])
     const [ward, setWard] = useState('')
     const [loc, setLoc] = useState('')
+    const [loadError, setLoadError] = useState(false)
     const [reload, setReload] = useState(0)
     const [surveyId, setSurveyId] = useState(new URLSearchParams(location.search).get('surveyId'))
 
@@ -148,21 +149,17 @@ function Survey() {
         return (
 
             isTabletOrMobile ?
-                <Grid container spacing={20}>
-                    <Grid item xs={20}>
-                        <Card style={{ paddingLeft: '10px', paddingRight: '10px', marginRight: '1px', marginLeft: '1px', textAlign: 'center', background: 'lightgrey' }} {...other}>
+                    <Grid item>
+                        <Card style={{ paddingLeft: '10px', paddingRight: '10px', marginRight: '3.5px', marginLeft: '3.5px', textAlign: 'center', background: 'lightgrey' }} {...other}>
                             <Typography variant='h6'>{value - 1}</Typography>
                         </Card>
                     </Grid>
-                </Grid> :
-                <Grid container spacing={20}>
-                    <Grid item xs={20}>
-                        <Card style={{ paddingLeft: '10px', paddingRight: '10px', marginRight: '5px', marginLeft: '5px', textAlign: 'center', background: 'lightgrey' }} {...other}>
+                :
+                    <Grid item>
+                        <Card style={{ paddingLeft: '10px', paddingRight: '10px', marginRight: '30px', marginLeft: '30px', textAlign: 'center', background: 'lightgrey' }} {...other}>
                             <Typography variant='h6'>{value - 1}</Typography>
                         </Card>
                     </Grid>
-                </Grid>
-
         )
     }
 
@@ -288,10 +285,26 @@ function Survey() {
                 if (data?.errors?.length > 0) throw new Error(data?.errors[0].message)
                 console.log(data?.data?.survey)
                 setSurveyData(data?.data?.survey?.templateSurvey.templateQuestions)
-                setWard(data?.data?.survey?.responses[0].text)
-                // setLoc(data?.data?.survey?.templateSurvey.templateQuestions.find(el => {
-                //     el.title === "CT Loc"
-                // }))
+            })
+    }
+
+    const loadSurveyWard = (accessToken) => {
+        fetch(surveyUrl, {
+            headers: {
+                'Content-type': 'application/json',
+                'Allow-Cross-Remote-Origin': '*',
+                'authentication': accessToken
+            },
+            method: 'POST',
+            body: JSON.stringify({
+                query: GET_WARD(surveyId)
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data?.errors?.length > 0) throw new Error(data?.errors[0].message)
+                // console.log(data?.data)
+                setWard(data?.data?.wardResponse?.text)
             })
     }
 
@@ -301,19 +314,23 @@ function Survey() {
         let isMounted = true
         if (isMounted) {
             authenticate()
-                .then(accessToken => loadSurveyQuestion(accessToken))
+                .then(accessToken => {
+                    loadSurveyQuestion(accessToken)
+                    loadSurveyWard(accessToken)
+                })
                 .catch(err => {
+                    setLoadError(true)
                     console.log(err)
                 })
         }
         return () => { isMounted = false }
     }, [])
 
-    // console.log(surveyData)
+    // console.log(token)
 
     return (
         <ThemeProvider theme={theme}>
-            {surveyData === undefined || surveyData === [] ?
+            {surveyData === undefined || surveyData === [] || loadError ?
                 <Typography variant='h5'> Survey does not exist or already completed</Typography> :
                 <div className={isTabletOrMobile ? "mobile__form form__font" : "form form__font"}>
 
@@ -402,26 +419,40 @@ function Survey() {
                                                                             }
                                                                             {
                                                                                 row.type.type === "rating" ?
+                                                                                <>
+                                                                                <Grid container direction="row" justify="space-between" alignItems="center">
+                                                                                    <Grid item>
+                                                                                        <Typography variant="body2"> Not at all likely </Typography>
+                                                                                    </Grid>
+                                                                                    <Grid item>
+                                                                                        <Typography variant="body2"> Extremely likely </Typography>
+                                                                                    </Grid>
+                                                                                </Grid>
+                                                                                
                                                                                     <Controller
-                                                                                        name={`surveyResponse.rating.${row.id}`}
-                                                                                        control={control}
-                                                                                        render={({field}) => 
-                                                                                            <Rating
-                                                                                                value={row.ratings.title}
-                                                                                                max={row.ratings.length}
-                                                                                                IconContainerComponent={IconContainer}
-                                                                                                fullWidth
-                                                                                            />
-                                                                                        }
-                                                                                        // as={
-                                                                                        //     <Rating
-                                                                                        //         value={row.ratings.title}
-                                                                                        //         max={row.ratings.length}
-                                                                                        //         IconContainerComponent={IconContainer}
-                                                                                        //         fullWidth
-                                                                                        //     />
-                                                                                        // }
-                                                                                    /> :
+                                                                                            name={`surveyResponse.rating.${row.id}`}
+                                                                                            control={control}
+                                                                                            render={({field}) => 
+                                                                                                <Grid container direction="row" justify="space-between" alignItems="center">
+                                                                                                    <Rating
+                                                                                                        value={row.ratings.title}
+                                                                                                        max={row.ratings.length}
+                                                                                                        IconContainerComponent={IconContainer}
+                                                                                                        fullWidth
+                                                                                                    />
+                                                                                                </Grid>
+                                                                                            }
+                                                                                            // as={
+                                                                                            //     <Rating
+                                                                                            //         value={row.ratings.title}
+                                                                                            //         max={row.ratings.length}
+                                                                                            //         IconContainerComponent={IconContainer}
+                                                                                            //         fullWidth
+                                                                                            //     />
+                                                                                            // }
+                                                                                    />
+                                                                                
+                                                                                </> :
                                                                                     undefined
                                                                             }
                                                                         </FormControl>
