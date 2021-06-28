@@ -29,8 +29,8 @@ function Survey() {
     //VARIABLES
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
     //const surveyId = new URLSearchParams(location.search).get('surveyId')
-    const surveyUrl = process.env.REACT_APP_BACKEND_URL
-    // const surveyUrl = 'https://ah-dev-pes-backend.azurewebsites.net/graphql'
+    // const surveyUrl = process.env.REACT_APP_BACKEND_URL
+    const surveyUrl = 'https://ah-dev-pes-backend.azurewebsites.net/graphql'
     let questNo = 0
 
     //STYLES
@@ -48,9 +48,16 @@ function Survey() {
             maxWidth: 1000,
         },
         paper: {
+            alignItems: 'center',
+            marginLeft: '35px',
+            marginRight: '35px',
+            width: '97.8%',
+        },
+        mobilePaper: {
+            alignItems: 'center',
             marginLeft: '15px',
             marginRight: '15px',
-            width: '97.8%'
+            width: '97.8%',
         },
         cancelButton: {
             color: 'red',
@@ -61,6 +68,11 @@ function Survey() {
             verticalAlign: 'center'
         },
         submitButton: {
+            marginLeft: '35px',
+            marginRight: '35px',
+            width: '97.8%'
+        },
+        mobileSubmitButton: {
             marginLeft: '15px',
             marginRight: '15px',
             width: '97.8%'
@@ -87,7 +99,7 @@ function Survey() {
         },
         formList: {
             marginTop: '2px',
-            width: '100%',
+            width: '95.5%',
             textAlign: 'left',
             // display: 'flex'
         }
@@ -156,7 +168,7 @@ function Survey() {
                     </Grid>
                 :
                     <Grid item>
-                        <Card style={{ paddingLeft: '10px', paddingRight: '10px', marginRight: '30px', marginLeft: '30px', textAlign: 'center', background: 'lightgrey' }} {...other}>
+                        <Card style={{ paddingLeft: '10px', paddingRight: '10px', marginRight: '28px', marginLeft: '28px', textAlign: 'center', background: 'lightgrey' }} {...other}>
                             <Typography variant='h6'>{value - 1}</Typography>
                         </Card>
                     </Grid>
@@ -335,7 +347,7 @@ function Survey() {
                 <div className={isTabletOrMobile ? "mobile__form form__font" : "form form__font"}>
 
                     <div className={classes.formList}>
-                        <Paper className={classes.paper} elevation={3}>
+                        <Paper className={isTabletOrMobile? classes.mobilePaper : classes.paper} elevation={3}>
                             <div className={classes.formItem}>
                                 <Typography variant="h6">
                                     <b>Patient Experience Survey</b>
@@ -344,10 +356,10 @@ function Survey() {
                         </Paper>
 
                         <form onSubmit={handleSubmit(submitAction)}>
-                            <Paper className={classes.paper} style={{ paddingTop: '10px', paddingBottom: '25px' }} elevation={3}>
+                            <Paper className={isTabletOrMobile? classes.mobilePaper : classes.paper} style={{ paddingTop: '10px', paddingBottom: '25px' }} elevation={3}>
                                 { confirmSuccess === false ? 
                                     <>
-                                        <Typography className={classes.formItem} style={{ marginLeft: '15px' }} variant="body2">  {`Thinking about the recent inpatient admission in '${ward}', please complete this survey regarding your experience`} </Typography>
+                                        <Typography className={classes.formItem} style={{ marginLeft: '15px' }} variant="body2">  {`Thinking about the recent inpatient admission in ${ward}, please complete this survey regarding your experience`} </Typography>
                                         {
                                             surveyData.map((row) => {
                                                 if (row.status !== "hidden"){
@@ -469,7 +481,7 @@ function Survey() {
                                 }
                             </Paper>
                             <div className="align__center">
-                                <Button className={classes.submitButton} variant="contained" color="primary" type="Submit" disabled={confirmSuccess === true ? true : false}>Submit Survey</Button>
+                                <Button className={isTabletOrMobile ? classes.mobileSubmitButton : classes.submitButton} variant="contained" color="primary" type="Submit" disabled={confirmSuccess === true ? true : false}>Submit Survey</Button>
                             </div>
                         </form>
                         <Collapse in={confirmSuccess}>

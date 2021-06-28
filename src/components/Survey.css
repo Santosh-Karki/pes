@@ -9,7 +9,6 @@
     background-color: #dfdfdf;;
     overflow-y: auto;
     overflow-x: hidden;
-    min-width: fit-content;
 }
 
 .mobile__form{
@@ -18,7 +17,6 @@
     background-color: #dfdfdf;;
     overflow-y: auto;
     overflow-x: auto;
-    min-width: fit-content;
 }
 
 .form__font {
@@ -27,7 +25,7 @@
 
 .form__list {
     margin-top: 2px;
-    width: 59vw;
+    width: 55vw;
     text-align: left;
 }
 
