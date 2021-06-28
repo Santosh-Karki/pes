@@ -2,7 +2,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Karla&display=swap');
 
 .form{
-    height: 89.8vh;
+    min-height: 89.8vh;
     margin-left: 20vw;
     margin-right: 20vw;
     display: flex;
@@ -13,11 +13,11 @@
 }
 
 .mobile__form{
-    height: 89.8vh;
+    min-height: 89.8vh;
     display: flex;
     background-color: #dfdfdf;;
     overflow-y: auto;
-    /* overflow-x: hidden; */
+    overflow-x: auto;
     min-width: fit-content;
 }
 

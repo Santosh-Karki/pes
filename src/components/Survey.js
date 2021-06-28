@@ -36,9 +36,11 @@ function Survey() {
     const useStyles = makeStyles(theme => ({
         select: {
             height: 35,
+            // marginBottom: '100px',
             // minWidth: '100%',
             // maxWidth: 1000,
-            // display: 'flex'
+            // display: 'block',
+            position: 'unset'
         },
         fillWidth: {
             minWidth: '100%',
@@ -81,7 +83,6 @@ function Survey() {
             marginRight: '20px',
             marginTop: '10px',
             marginBottom: '10px',
-            // display: 'flex'
         },
         formList: {
             marginTop: '2px',
@@ -336,7 +337,7 @@ function Survey() {
                                                     questNo++
                                                     return (
                                                         <>
-                                                            <div className={classes.formItem} style={{ height: '5vh', verticalAlign: 'middle' }}>
+                                                            <div className={classes.formItem} style={{ verticalAlign: 'middle' }}>
                                                                 <Grid container spacing={0}>
                                                                     <Grid item xs={12}>
                                                                         <Typography className={classes.formItem} variant="body2">  {questNo}. {row.title} </Typography>
@@ -346,7 +347,7 @@ function Survey() {
                                                                             {
                                                                                 row.type.type === "dropdown" ?
                                                                                     <Controller
-                                                                                        as={
+                                                                                        render={({field}) => 
                                                                                             <Select
                                                                                                 required
                                                                                                 variant="outlined"
@@ -360,6 +361,20 @@ function Survey() {
                                                                                                 }
                                                                                             </Select>
                                                                                         }
+                                                                                        // as={
+                                                                                        //     <Select
+                                                                                        //         required
+                                                                                        //         variant="outlined"
+                                                                                        //         className={classes.select}
+                                                                                        //         size="small"
+                                                                                        //     >
+                                                                                        //         {
+                                                                                        //             row.dropdowns.map(pos => (
+                                                                                        //                 <MenuItem value={pos}> {pos.title} </MenuItem>
+                                                                                        //             ))
+                                                                                        //         }
+                                                                                        //     </Select>
+                                                                                        // }
                                                                                         name={`surveyResponse.dropdown.${row.id}`}
                                                                                         control={control}
                                                                                     /> :
@@ -390,7 +405,7 @@ function Survey() {
                                                                                     <Controller
                                                                                         name={`surveyResponse.rating.${row.id}`}
                                                                                         control={control}
-                                                                                        as={
+                                                                                        render={({field}) => 
                                                                                             <Rating
                                                                                                 value={row.ratings.title}
                                                                                                 max={row.ratings.length}
@@ -398,6 +413,14 @@ function Survey() {
                                                                                                 fullWidth
                                                                                             />
                                                                                         }
+                                                                                        // as={
+                                                                                        //     <Rating
+                                                                                        //         value={row.ratings.title}
+                                                                                        //         max={row.ratings.length}
+                                                                                        //         IconContainerComponent={IconContainer}
+                                                                                        //         fullWidth
+                                                                                        //     />
+                                                                                        // }
                                                                                     /> :
                                                                                     undefined
                                                                             }
