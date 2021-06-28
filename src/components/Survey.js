@@ -13,17 +13,19 @@ import useToken from './common/useToken';
 
 function Survey() {
     const { token, setToken } = useToken();
+    const location = useLocation();
 
     //STATES
     const [confirmSuccess, setConfirmSuccess] = useState(false)
     const [confirmError, setConfirmError] = useState(false)
     const [surveyData, setSurveyData] = useState([])
     const [reload, setReload] = useState(0)
+    const [surveyId, setSurveyId] = useState(new URLSearchParams(location.search).get('surveyId'))
 
     //VARIABLES
-    const location = useLocation();
+
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
-    const surveyId = new URLSearchParams(location.search).get('surveyId')
+    //const surveyId = new URLSearchParams(location.search).get('surveyId')
     const surveyUrl = process.env.REACT_APP_BACKEND_URL
     // const surveyUrl = 'https://ah-dev-pes-backend.azurewebsites.net/graphql'
 
@@ -256,7 +258,10 @@ function Survey() {
         })
             .then(res => res.json())
             .then(data => {
-                setToken(data?.data?.authenticate)
+                if (data?.errors?.length > 1)
+                    console.log(data?.errors[0].message)
+                else
+                    setToken(data?.data?.authenticate)
             })
     }
 
@@ -284,14 +289,10 @@ function Survey() {
     //INIT
     //FETCH SURVEY DATA
     useEffect(() => {
-        if (!token) {
-            authenticate()
-        }
-
-        if (token) {
+        authenticate()
+        if (token)
             loadSurveyQuestion()
-        }
-    }, [token])
+    }, [])
 
     console.log(surveyData)
 
