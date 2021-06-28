@@ -29,8 +29,8 @@ function Survey() {
     //VARIABLES
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
     //const surveyId = new URLSearchParams(location.search).get('surveyId')
-    // const surveyUrl = process.env.REACT_APP_BACKEND_URL
-    const surveyUrl = 'https://ah-dev-pes-backend.azurewebsites.net/graphql'
+    const surveyUrl = process.env.REACT_APP_BACKEND_URL
+    // const surveyUrl = 'https://ah-dev-pes-backend.azurewebsites.net/graphql'
     let questNo = 0
 
     //STYLES
