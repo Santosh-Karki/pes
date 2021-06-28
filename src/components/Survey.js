@@ -248,7 +248,7 @@ function Survey() {
     });
 
     const authenticate = () => {
-        fetch(surveyUrl, {
+        return fetch(surveyUrl, {
             headers: {
                 'Content-type': 'application/json',
                 'Allow-Cross-Remote-Origin': '*'
@@ -258,20 +258,20 @@ function Survey() {
         })
             .then(res => res.json())
             .then(data => {
-                if (data?.errors?.length > 1)
-                    console.log(data?.errors[0].message)
-                else
-                    setToken(data?.data?.authenticate)
+                if (data?.errors?.length > 0) throw new Error(data?.errors[0].message)
+
+                const accessToken = data?.data?.authenticate
+                setToken(accessToken)
+                return accessToken
             })
     }
 
-    const loadSurveyQuestion = () => {
-        let isMounted = true
+    const loadSurveyQuestion = (accessToken) => {
         fetch(surveyUrl, {
             headers: {
                 'Content-type': 'application/json',
                 'Allow-Cross-Remote-Origin': '*',
-                'authentication': token
+                'authentication': accessToken
             },
             method: 'POST',
             body: JSON.stringify({
@@ -280,18 +280,24 @@ function Survey() {
         })
             .then(res => res.json())
             .then(data => {
-                // console.log(data.data.survey.templateSurvey.templateQuestions)
+                if (data?.errors?.length > 0) throw new Error(data?.errors[0].message)
+
                 setSurveyData(data?.data?.survey?.templateSurvey.templateQuestions)
             })
-        return () => { isMounted = false }
     }
 
     //INIT
     //FETCH SURVEY DATA
     useEffect(() => {
-        authenticate()
-        if (token)
-            loadSurveyQuestion()
+        let isMounted = true
+        if (isMounted) {
+            authenticate()
+                .then(accessToken => loadSurveyQuestion(accessToken))
+                .catch(err => {
+                    console.log(err)
+                })
+        }
+        return () => { isMounted = false }
     }, [])
 
     console.log(surveyData)
