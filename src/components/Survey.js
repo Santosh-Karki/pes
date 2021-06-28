@@ -55,9 +55,9 @@ function Survey() {
         },
         mobilePaper: {
             alignItems: 'center',
-            marginLeft: '15px',
-            marginRight: '15px',
-            width: '97.8%',
+            marginLeft: '10px',
+            marginRight: '10px',
+            width: '100%',
         },
         cancelButton: {
             color: 'red',
@@ -73,9 +73,9 @@ function Survey() {
             width: '97.8%'
         },
         mobileSubmitButton: {
-            marginLeft: '15px',
-            marginRight: '15px',
-            width: '97.8%'
+            marginLeft: '10px',
+            marginRight: '10px',
+            width: '100%'
         },
         ratingCard: {
             margin: '15px',
