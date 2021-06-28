@@ -162,7 +162,7 @@ function Survey() {
 
             isTabletOrMobile ?
                     <Grid item>
-                        <Card style={{ paddingLeft: '10px', paddingRight: '10px', marginRight: '3.5px', marginLeft: '3.5px', textAlign: 'center', background: 'lightgrey' }} {...other}>
+                        <Card style={{ paddingLeft: '10px', paddingRight: '10px', marginRight: '1px', marginLeft: '1px', textAlign: 'center', background: 'lightgrey' }} {...other}>
                             <Typography variant='h6'>{value - 1}</Typography>
                         </Card>
                     </Grid>
