@@ -481,12 +481,12 @@ function Survey() {
                                 <Button className={isTabletOrMobile ? classes.mobileSubmitButton : classes.submitButton} variant="contained" color="primary" type="Submit" disabled={confirmSuccess === true ? true : false}>Submit Survey</Button>
                             </div>
                         </form>
-                        <Collapse in={confirmSuccess}>
+                        {/* <Collapse in={confirmSuccess}>
                             <Alert severity="success">
                                 <AlertTitle>Success</AlertTitle>
                                 Survey Submitted
                             </Alert>
-                        </Collapse>
+                        </Collapse> */}
 
                         <Collapse in={confirmError}>
                             <Alert severity="error">

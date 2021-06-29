@@ -10,7 +10,7 @@ function ThankYou() {
                 <br/>
                 Your responses will be used for quality improvement purposes. <br/>
                 <br/>
-                If you would like to provide further feedback, please email feedback@austin.org.au <br/>
+                If you would like to provide further feedback regarding your experience, please email <a href='mailto:feedback@austin.org.au' target="_blank" rel="noopener noreferrer"> feedback@austin.org.au </a> <br/>
                 <br/>
                 With thanks <br/>
 
