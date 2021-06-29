@@ -202,13 +202,14 @@ function Survey() {
             inputs.push(temp)
         })
         answers.rating.map((ans, index) => {
+            const ansValue = ans - 1
             let temp = {}
             temp.templateQuestionId = index
             temp.typeId = 3
             surveyData.map(el => {
                 if (el.id == index) {
                     el.ratings.map(rate => {
-                        if (rate.value == ans) {
+                        if (rate.value == ansValue) {
                             console.log('here')
                             console.log(rate.id)
                             temp.ratingId = rate.id
@@ -444,7 +445,17 @@ function Survey() {
                                                                                     <Controller
                                                                                             name={`surveyResponse.rating.${row.id}`}
                                                                                             control={control}
-                                                                                            render={({field}) => 
+                                                                                            // render={({field}) => 
+                                                                                            //     <Grid container direction="row" justify="space-between" alignItems="center">
+                                                                                            //         <Rating
+                                                                                            //             value={row.ratings.title}
+                                                                                            //             max={row.ratings.length}
+                                                                                            //             IconContainerComponent={IconContainer}
+                                                                                            //             fullWidth
+                                                                                            //         />
+                                                                                            //     </Grid>
+                                                                                            // }
+                                                                                            as={
                                                                                                 <Grid container direction="row" justify="space-between" alignItems="center">
                                                                                                     <Rating
                                                                                                         value={row.ratings.title}
@@ -454,14 +465,6 @@ function Survey() {
                                                                                                     />
                                                                                                 </Grid>
                                                                                             }
-                                                                                            // as={
-                                                                                            //     <Rating
-                                                                                            //         value={row.ratings.title}
-                                                                                            //         max={row.ratings.length}
-                                                                                            //         IconContainerComponent={IconContainer}
-                                                                                            //         fullWidth
-                                                                                            //     />
-                                                                                            // }
                                                                                     />
                                                                                 
                                                                                 </> :
