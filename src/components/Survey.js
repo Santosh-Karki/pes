@@ -9,7 +9,7 @@ import { GET_SURVEY, SUBMIT_SURVEY, AUTHENTICATE, GET_WARD } from './common/Quer
 import fontKarla from '../resources/karla-v14-latin-regular.woff2'
 import fontWorkSans from '../resources/WorkSans-VariableFont_wght.ttf'
 import { Alert, AlertTitle, Rating } from '@material-ui/lab';
-import { MenuItem, Paper, Select, Typography, FormControl, Grid, makeStyles, TextField, Button, Collapse, ThemeProvider, createMuiTheme, Card } from '@material-ui/core'
+import { MenuItem, Paper, Select, Typography, FormControl, Grid, makeStyles, TextField, Button, Collapse, ThemeProvider, createMuiTheme, Card, Slider } from '@material-ui/core'
 import useToken from './common/useToken';
 
 function Survey() {
@@ -437,16 +437,28 @@ function Survey() {
                                                                                     <Controller
                                                                                             name={`surveyResponse.rating.${row.id}`}
                                                                                             control={control}
-                                                                                            as={
-                                                                                                <Grid container direction="row" justify="space-between" alignItems="center">
-                                                                                                    <Rating
-                                                                                                        value={row.ratings.title}
-                                                                                                        max={row.ratings.length}
-                                                                                                        IconContainerComponent={IconContainer}
-                                                                                                        fullWidth
-                                                                                                    />
-                                                                                                </Grid>
-                                                                                            }
+                                                                                            onChange={([, value]) => value}
+                                                                                            // as={
+                                                                                            //     <Grid container direction="row" justify="space-between" alignItems="center">
+                                                                                            //         <Rating
+                                                                                            //             value={row.ratings.title}
+                                                                                            //             max={row.ratings.length}
+                                                                                            //             IconContainerComponent={IconContainer}
+                                                                                            //             fullWidth
+                                                                                            //         />
+                                                                                            //     </Grid>
+                                                                                            // }
+                                                                                            render={(props) => (
+                                                                                                <Slider
+                                                                                                  {...props}
+                                                                                                  onChange={(_, value) => {
+                                                                                                    props.onChange(value);
+                                                                                                  }}
+                                                                                                  valueLabelDisplay="auto"
+                                                                                                  max={row.ratings[row.ratings.length - 1].value}
+                                                                                                //   step={1}
+                                                                                                />
+                                                                                              )}
                                                                                     />
                                                                                 
                                                                                 </> :
