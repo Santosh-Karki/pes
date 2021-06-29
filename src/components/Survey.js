@@ -28,7 +28,7 @@ function Survey() {
 
     //VARIABLES
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
-    //const surveyId = new URLSearchParams(location.search).get('surveyId')
+    // const surveyId = new URLSearchParams(location.search).get('surveyId')
     const surveyUrl = process.env.REACT_APP_BACKEND_URL
     // const surveyUrl = 'https://ah-dev-pes-backend.azurewebsites.net/graphql'
     let questNo = 0
@@ -376,21 +376,7 @@ function Survey() {
                                                                             {
                                                                                 row.type.type === "dropdown" ?
                                                                                     <Controller
-                                                                                        render={({field}) => 
-                                                                                            <Select
-                                                                                                required
-                                                                                                variant="outlined"
-                                                                                                className={classes.select}
-                                                                                                size="small"
-                                                                                            >
-                                                                                                {
-                                                                                                    row.dropdowns.map(pos => (
-                                                                                                        <MenuItem value={pos}> {pos.title} </MenuItem>
-                                                                                                    ))
-                                                                                                }
-                                                                                            </Select>
-                                                                                        }
-                                                                                        // as={
+                                                                                        // render={({field}) => 
                                                                                         //     <Select
                                                                                         //         required
                                                                                         //         variant="outlined"
@@ -404,6 +390,20 @@ function Survey() {
                                                                                         //         }
                                                                                         //     </Select>
                                                                                         // }
+                                                                                        as={
+                                                                                            <Select
+                                                                                                required
+                                                                                                variant="outlined"
+                                                                                                className={classes.select}
+                                                                                                size="small"
+                                                                                            >
+                                                                                                {
+                                                                                                    row.dropdowns.map(pos => (
+                                                                                                        <MenuItem value={pos}> {pos.title} </MenuItem>
+                                                                                                    ))
+                                                                                                }
+                                                                                            </Select>
+                                                                                        }
                                                                                         name={`surveyResponse.dropdown.${row.id}`}
                                                                                         control={control}
                                                                                     /> :
