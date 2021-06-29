@@ -377,23 +377,9 @@ function Survey() {
                                                                             {
                                                                                 row.type.type === "dropdown" ?
                                                                                     <Controller
-                                                                                        // render={({field}) => 
-                                                                                        //     <Select
-                                                                                        //         required
-                                                                                        //         variant="outlined"
-                                                                                        //         className={classes.select}
-                                                                                        //         size="small"
-                                                                                        //     >
-                                                                                        //         {
-                                                                                        //             row.dropdowns.map(pos => (
-                                                                                        //                 <MenuItem value={pos}> {pos.title} </MenuItem>
-                                                                                        //             ))
-                                                                                        //         }
-                                                                                        //     </Select>
-                                                                                        // }
                                                                                         as={
                                                                                             <Select
-                                                                                                required
+                                                                                                required= {row.required ? true : false}
                                                                                                 variant="outlined"
                                                                                                 className={classes.select}
                                                                                                 size="small"
@@ -412,22 +398,28 @@ function Survey() {
                                                                             }
                                                                             {
                                                                                 row.type.type === "text" ?
-                                                                                    <Controller
-                                                                                        as={<TextField
-                                                                                            ref={
-                                                                                                register({
-                                                                                                    required: true
-                                                                                                })
-                                                                                            }
-                                                                                            required
-                                                                                            label={row.title}
-                                                                                            variant="outlined"
-                                                                                            size="small"
-                                                                                            multiline fillWidth
-                                                                                        />}
-                                                                                        name={`surveyResponse.text.${row.id}`}
-                                                                                        control={control}
-                                                                                    /> :
+                                                                                    <>
+                                                                                        <Typography style={{textAlign: 'right'}} variant='body2'>Max 500 characters</Typography>
+                                                                                        <Controller
+                                                                                            as={<TextField
+                                                                                                ref={
+                                                                                                    register({
+                                                                                                        required: row.required ? true : false
+                                                                                                    })
+                                                                                                }
+                                                                                                required= {row.required ? true : false}
+                                                                                                label={row.title}
+                                                                                                variant="outlined"
+                                                                                                size="small"
+                                                                                                multiline fillWidth
+                                                                                                inputProps={{
+                                                                                                    maxLength: 500,
+                                                                                                }}
+                                                                                            />}
+                                                                                            name={`surveyResponse.text.${row.id}`}
+                                                                                            control={control}
+                                                                                        /> 
+                                                                                    </>    :
                                                                                     undefined
                                                                             }
                                                                             {
@@ -435,26 +427,16 @@ function Survey() {
                                                                                 <>
                                                                                 <Grid container direction="row" justify="space-between" alignItems="center">
                                                                                     <Grid item>
-                                                                                        <Typography variant="body2"> Not at all likely </Typography>
+                                                                                        <Typography variant="body2"> {row.ratings[0].title} </Typography>
                                                                                     </Grid>
                                                                                     <Grid item>
-                                                                                        <Typography variant="body2"> Extremely likely </Typography>
+                                                                                        <Typography variant="body2"> {row.ratings[row.ratings.length - 1].title} </Typography>
                                                                                     </Grid>
                                                                                 </Grid>
                                                                                 
                                                                                     <Controller
                                                                                             name={`surveyResponse.rating.${row.id}`}
                                                                                             control={control}
-                                                                                            // render={({field}) => 
-                                                                                            //     <Grid container direction="row" justify="space-between" alignItems="center">
-                                                                                            //         <Rating
-                                                                                            //             value={row.ratings.title}
-                                                                                            //             max={row.ratings.length}
-                                                                                            //             IconContainerComponent={IconContainer}
-                                                                                            //             fullWidth
-                                                                                            //         />
-                                                                                            //     </Grid>
-                                                                                            // }
                                                                                             as={
                                                                                                 <Grid container direction="row" justify="space-between" alignItems="center">
                                                                                                     <Rating

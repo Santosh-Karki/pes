@@ -26,6 +26,7 @@ export const GET_SURVEY = (id) => `
           status
         }
         status
+        required
         ordering
         ratings {
           id
