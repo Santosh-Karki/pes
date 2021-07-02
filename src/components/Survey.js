@@ -28,7 +28,6 @@ function Survey() {
 
     //VARIABLES
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
-    // const surveyId = new URLSearchParams(location.search).get('surveyId')
     const surveyUrl = process.env.REACT_APP_BACKEND_URL
     // const surveyUrl = 'https://ah-dev-pes-backend.azurewebsites.net/graphql'
     let questNo = 0
@@ -183,7 +182,7 @@ function Survey() {
         console.log(data)
         const answers = data.surveyResponse
         let inputs = []
-        answers.dropdown.map((ans, index) => {
+        answers?.dropdown?.map((ans, index) => {
             let temp = {}
             temp.templateQuestionId = index
             temp.typeId = 2
@@ -192,7 +191,7 @@ function Survey() {
             temp.text = null
             inputs.push(temp)
         })
-        answers.text.map((ans, index) => {
+        answers?.text?.map((ans, index) => {
             let temp = {}
             temp.templateQuestionId = index
             temp.typeId = 4
@@ -201,7 +200,7 @@ function Survey() {
             temp.text = ans
             inputs.push(temp)
         })
-        answers.rating.map((ans, index) => {
+        answers?.rating?.map((ans, index) => {
             const ansValue = ans - 1
             let temp = {}
             temp.templateQuestionId = index
@@ -253,6 +252,15 @@ function Survey() {
             })
     }
 
+    const findRatingByValue = (ratings, val) => {
+        const result = ratings.map(el => {
+            if(el.value == val){
+                return el.title
+            }
+        })
+        console.log(result)
+        return result
+    }
 
     //CONTROLS
     const { control, register, errors, handleSubmit, watch, setValue, getValues, reset } = useForm({
@@ -261,6 +269,8 @@ function Survey() {
             surveyResponse: { surveyId: "", input: [] }
         },
     });
+
+    const watchForm = watch()
 
     const authenticate = () => {
         return fetch(surveyUrl, {
@@ -339,7 +349,7 @@ function Survey() {
         return () => { isMounted = false }
     }, [])
 
-    // console.log(token)
+    console.log(watchForm.surveyResponse.rating? watchForm.surveyResponse.rating[8] : '')
 
     return (
         <ThemeProvider theme={theme}>
@@ -362,8 +372,8 @@ function Survey() {
                                     <>
                                         <Typography className={classes.formItem} style={{ marginLeft: '15px' }} variant="body2">  {`Thinking about the recent inpatient admission in ${ward}, please complete this survey regarding your experience`} </Typography>
                                         {
-                                            surveyData.map((row) => {
-                                                if (row.status !== "hidden"){
+                                            surveyData.map((row, index) => {
+                                                if (row.status === "active"){
                                                     questNo++
                                                     return (
                                                         <>
@@ -425,40 +435,46 @@ function Survey() {
                                                                             {
                                                                                 row.type.type === "rating" ?
                                                                                 <>
-                                                                                <Grid container direction="row" justify="space-between" alignItems="center">
+                                                                                {/* <Grid container direction="row" justify="space-between" alignItems="center">
                                                                                     <Grid item>
                                                                                         <Typography variant="body2"> {row.ratings[0].title} </Typography>
                                                                                     </Grid>
                                                                                     <Grid item>
                                                                                         <Typography variant="body2"> {row.ratings[row.ratings.length - 1].title} </Typography>
                                                                                     </Grid>
-                                                                                </Grid>
-                                                                                
+                                                                                </Grid> */}
+                                                                                {/* (1: Not at all likely, 2: Unlikely, 3: Neutral, 4: Likely, 5: Extremely likely) */}
+                                                                                {/* <Typography variant='body2'> {`(1: Very dissatisfied, 2: Dissatisfied, 3: Neutral, 4: Satisfied, 5: Very Satisfied)`} </Typography> */}
                                                                                     <Controller
-                                                                                            name={`surveyResponse.rating.${row.id}`}
-                                                                                            control={control}
-                                                                                            onChange={([, value]) => value}
-                                                                                            // as={
-                                                                                            //     <Grid container direction="row" justify="space-between" alignItems="center">
-                                                                                            //         <Rating
-                                                                                            //             value={row.ratings.title}
-                                                                                            //             max={row.ratings.length}
-                                                                                            //             IconContainerComponent={IconContainer}
-                                                                                            //             fullWidth
-                                                                                            //         />
-                                                                                            //     </Grid>
-                                                                                            // }
-                                                                                            render={(props) => (
-                                                                                                <Slider
-                                                                                                  {...props}
-                                                                                                  onChange={(_, value) => {
-                                                                                                    props.onChange(value);
-                                                                                                  }}
-                                                                                                  valueLabelDisplay="auto"
-                                                                                                  max={row.ratings[row.ratings.length - 1].value}
-                                                                                                //   step={1}
-                                                                                                />
-                                                                                              )}
+                                                                                        name={`surveyResponse.rating.${row.id}`}
+                                                                                        control={control}
+                                                                                        onChange={([, value]) => value}
+                                                                                        as={
+                                                                                            // <Grid container direction="row" justify="space-between" alignItems="center">
+                                                                                            //     <Grid item xs={1}>
+                                                                                                    <Rating
+                                                                                                        value={row.ratings.title}
+                                                                                                        max={row.ratings.length}
+                                                                                                        // IconContainerComponent={IconContainer}
+                                                                                                    />
+                                                                                                // </Grid>
+                                                                                                // {/* <Grid item xs={9}>
+                                                                                                //     <Typography variant='body2'>{watchForm.surveyResponse.rating ? findRatingByValue(row.ratings, watchForm.surveyResponse.rating[row.id]) : ''}
+                                                                                                //     </Typography>
+                                                                                                // </Grid> */}
+                                                                                            // </Grid>
+                                                                                        }
+                                                                                        // render={(props) => (
+                                                                                        //     <Slider
+                                                                                        //         {...props}
+                                                                                        //         onChange={(_, value) => {
+                                                                                        //         props.onChange(value);
+                                                                                        //         }}
+                                                                                        //         valueLabelDisplay="auto"
+                                                                                        //         max={row.ratings[row.ratings.length - 1].value}
+                                                                                        //     //   step={1}
+                                                                                        //     />
+                                                                                        // )}
                                                                                     />
                                                                                 
                                                                                 </> :
@@ -478,7 +494,9 @@ function Survey() {
                                 }
                             </Paper>
                             <div className="align__center">
-                                <Button className={isTabletOrMobile ? classes.mobileSubmitButton : classes.submitButton} variant="contained" color="primary" type="Submit" disabled={confirmSuccess === true ? true : false}>Submit Survey</Button>
+                                <Collapse in={!confirmSuccess}>
+                                    <Button className={isTabletOrMobile ? classes.mobileSubmitButton : classes.submitButton} variant="contained" color="primary" type="Submit">Submit Survey</Button>
+                                </Collapse>
                             </div>
                         </form>
                         {/* <Collapse in={confirmSuccess}>
