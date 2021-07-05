@@ -435,46 +435,46 @@ function Survey() {
                                                                             {
                                                                                 row.type.type === "rating" ?
                                                                                 <>
-                                                                                {/* <Grid container direction="row" justify="space-between" alignItems="center">
+                                                                                <Grid container direction="row" justify="space-between" alignItems="center">
                                                                                     <Grid item>
                                                                                         <Typography variant="body2"> {row.ratings[0].title} </Typography>
                                                                                     </Grid>
                                                                                     <Grid item>
                                                                                         <Typography variant="body2"> {row.ratings[row.ratings.length - 1].title} </Typography>
                                                                                     </Grid>
-                                                                                </Grid> */}
+                                                                                </Grid>
                                                                                 {/* (1: Not at all likely, 2: Unlikely, 3: Neutral, 4: Likely, 5: Extremely likely) */}
                                                                                 {/* <Typography variant='body2'> {`(1: Very dissatisfied, 2: Dissatisfied, 3: Neutral, 4: Satisfied, 5: Very Satisfied)`} </Typography> */}
                                                                                     <Controller
                                                                                         name={`surveyResponse.rating.${row.id}`}
                                                                                         control={control}
                                                                                         onChange={([, value]) => value}
-                                                                                        as={
+                                                                                        // as={
                                                                                             // <Grid container direction="row" justify="space-between" alignItems="center">
                                                                                             //     <Grid item xs={1}>
-                                                                                                    <Rating
-                                                                                                        value={row.ratings.title}
-                                                                                                        max={row.ratings.length}
-                                                                                                        // IconContainerComponent={IconContainer}
-                                                                                                    />
+                                                                                                    // <Rating
+                                                                                                    //     value={row.ratings.title}
+                                                                                                    //     max={row.ratings.length}
+                                                                                                    //     // IconContainerComponent={IconContainer}
+                                                                                                    // />
                                                                                                 // </Grid>
                                                                                                 // {/* <Grid item xs={9}>
                                                                                                 //     <Typography variant='body2'>{watchForm.surveyResponse.rating ? findRatingByValue(row.ratings, watchForm.surveyResponse.rating[row.id]) : ''}
                                                                                                 //     </Typography>
                                                                                                 // </Grid> */}
                                                                                             // </Grid>
-                                                                                        }
-                                                                                        // render={(props) => (
-                                                                                        //     <Slider
-                                                                                        //         {...props}
-                                                                                        //         onChange={(_, value) => {
-                                                                                        //         props.onChange(value);
-                                                                                        //         }}
-                                                                                        //         valueLabelDisplay="auto"
-                                                                                        //         max={row.ratings[row.ratings.length - 1].value}
-                                                                                        //     //   step={1}
-                                                                                        //     />
-                                                                                        // )}
+                                                                                        // }
+                                                                                        render={(props) => (
+                                                                                            <Slider
+                                                                                                {...props}
+                                                                                                onChange={(_, value) => {
+                                                                                                props.onChange(value);
+                                                                                                }}
+                                                                                                valueLabelDisplay="auto"
+                                                                                                max={row.ratings[row.ratings.length - 1].value}
+                                                                                            //   step={1}
+                                                                                            />
+                                                                                        )}
                                                                                     />
                                                                                 
                                                                                 </> :
