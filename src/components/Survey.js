@@ -201,7 +201,7 @@ function Survey() {
             inputs.push(temp)
         })
         answers?.rating?.map((ans, index) => {
-            const ansValue = ans - 1
+            const ansValue = ans
             let temp = {}
             temp.templateQuestionId = index
             temp.typeId = 3
