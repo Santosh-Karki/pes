@@ -27,7 +27,7 @@ pipelines:
           - docker build . -t pes-frontend:$BITBUCKET_BUILD_NUMBER
           - docker image tag pes-frontend:$BITBUCKET_BUILD_NUMBER $DEV_DOCKER_REGISTRY/pes-frontend:$BITBUCKET_BUILD_NUMBER
           - docker image push $DEV_DOCKER_REGISTRY/pes-frontend:$BITBUCKET_BUILD_NUMBER
-          - pipe: docker://thlim78/azure-web-apps-containers-deploy:1.0.2
+          - pipe: docker://austinhealth/azure-web-apps-containers-deploy:1.0.2
             variables:
               AZURE_APP_ID: $DEV_AZURE_APP_ID
               AZURE_PASSWORD: $DEV_AZURE_PASSWORD
