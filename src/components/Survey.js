@@ -370,7 +370,7 @@ function Survey() {
                             <Paper className={isTabletOrMobile? classes.mobilePaper : classes.paper} style={{ paddingTop: '10px', paddingBottom: '25px' }} elevation={3}>
                                 { confirmSuccess === false ? 
                                     <>
-                                        <Typography className={classes.formItem} style={{ marginLeft: '15px' }} variant="body2">  {`Thinking about the recent inpatient admission in ${ward}, please complete this survey regarding your experience`} </Typography>
+                                        <Typography className={classes.formItem} style={{ marginLeft: '15px' }} variant="body2">  {`Thinking about the recent inpatient admission in ${ward.trimEnd()}, please complete this survey regarding your experience`} </Typography>
                                         {
                                             surveyData.map((row, index) => {
                                                 if (row.status === "active"){
