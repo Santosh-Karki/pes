@@ -464,17 +464,24 @@ function Survey() {
                                                                                                 // </Grid> */}
                                                                                             // </Grid>
                                                                                         // }
-                                                                                        render={(props) => (
-                                                                                            <Slider
-                                                                                                {...props}
-                                                                                                onChange={(_, value) => {
-                                                                                                props.onChange(value);
-                                                                                                }}
-                                                                                                valueLabelDisplay="auto"
-                                                                                                max={row.ratings[row.ratings.length - 1].value}
-                                                                                            //   step={1}
-                                                                                            />
-                                                                                        )}
+                                                                                        render={(props) => {
+                                                                                            let marks = []
+                                                                                            row.ratings.map((el) => {
+                                                                                                marks.push({value: el.value, label: el.value }) 
+                                                                                            })
+                                                                                            return (
+                                                                                                <Slider
+                                                                                                    {...props}
+                                                                                                    onChange={(_, value) => {
+                                                                                                    props.onChange(value);
+                                                                                                    }}
+                                                                                                    valueLabelDisplay="auto"
+                                                                                                    max={row.ratings[row.ratings.length - 1].value}
+                                                                                                    marks={marks}
+                                                                                                //   step={1}
+                                                                                                />
+                                                                                            )
+                                                                                        }}
                                                                                     />
                                                                                 
                                                                                 </> :
