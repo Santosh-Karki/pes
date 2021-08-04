@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types'
 import './Survey.css'
 import ThankYou from './ThankYou'
-import { GET_SURVEY, SUBMIT_SURVEY, AUTHENTICATE, GET_WARD } from './common/Queries'
+import { GET_SURVEY, SUBMIT_SURVEY, AUTHENTICATE, AUTHENTICATE_GP, GET_WARD, GET_SURVEY_GP } from './common/Queries'
 import fontKarla from '../resources/karla-v14-latin-regular.woff2'
 import fontWorkSans from '../resources/WorkSans-VariableFont_wght.ttf'
 import { Alert, AlertTitle, Rating } from '@material-ui/lab';
@@ -20,16 +20,22 @@ function Survey() {
     const [confirmSuccess, setConfirmSuccess] = useState(false)
     const [confirmError, setConfirmError] = useState(false)
     const [surveyData, setSurveyData] = useState([])
+    const [surveyName, setSurveyName] = useState('')
+    const [surveySubtitle, setSurveySubtitle] = useState('')
     const [ward, setWard] = useState('')
     const [loc, setLoc] = useState('')
     const [loadError, setLoadError] = useState(false)
     const [reload, setReload] = useState(0)
     const [surveyId, setSurveyId] = useState(new URLSearchParams(location.search).get('surveyId'))
+    const [ur, setUr] = useState(new URLSearchParams(location.search).get('ur'))
+    const [fin, setFin] = useState(new URLSearchParams(location.search).get('fin'))
+    const [typeId, setTypeId] = useState(new URLSearchParams(location.search).get('typeId'))
+    const [ed, setEd] = useState(new URLSearchParams(location.search).get('ed'))
 
     //VARIABLES
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
     const surveyUrl = process.env.REACT_APP_BACKEND_URL
-    // const surveyUrl = 'https://ah-dev-pes-backend.azurewebsites.net/graphql'
+    // const surveyUrl = 'http://localhost:9000/graphql'
     let questNo = 0
 
     //STYLES
@@ -273,6 +279,7 @@ function Survey() {
     const watchForm = watch()
 
     const authenticate = () => {
+        console.log('auth pes')
         return fetch(surveyUrl, {
             headers: {
                 'Content-type': 'application/json',
@@ -286,6 +293,30 @@ function Survey() {
                 if (data?.errors?.length > 0) throw new Error(data?.errors[0].message)
 
                 const accessToken = data?.data?.authenticate
+                // console.log(accessToken)
+                setToken(accessToken)
+                return accessToken
+            })
+    }
+
+    const authenticate_gp = () => {
+        console.log('gp')
+        console.log(AUTHENTICATE_GP(ur, fin, typeId, ed))
+        return fetch(surveyUrl, {
+            headers: {
+                'Content-type': 'application/json',
+                'Allow-Cross-Remote-Origin': '*'
+            },
+            method: 'POST',
+            body: JSON.stringify({ query: AUTHENTICATE_GP(ur, fin, typeId, ed) })
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                if (data?.errors?.length > 0) throw new Error(data?.errors[0].message)
+
+                const accessToken = data?.data?.authenticate_gp
+                console.log(accessToken)
                 setToken(accessToken)
                 return accessToken
             })
@@ -300,14 +331,18 @@ function Survey() {
             },
             method: 'POST',
             body: JSON.stringify({
-                query: GET_SURVEY(surveyId)
+                query: (typeId == 2 ? GET_SURVEY_GP({ur, fin, typeId, ed}) : GET_SURVEY(surveyId) )
             })
         })
             .then(res => res.json())
             .then(data => {
+                console.log(data)
                 if (data?.errors?.length > 0) throw new Error(data?.errors[0].message)
-                console.log(data?.data?.survey)
-                setSurveyData(data?.data?.survey?.templateSurvey.templateQuestions)
+                if (typeId == 2) {
+                    setSurveyData(data?.data?.survey_gp?.templateSurvey.templateQuestions)
+                } else {
+                    setSurveyData(data?.data?.survey?.templateSurvey.templateQuestions)
+                }
             })
     }
 
@@ -336,20 +371,60 @@ function Survey() {
     useEffect(() => {
         let isMounted = true
         if (isMounted) {
-            authenticate()
+            // surveyId ? authenticate() : authenticate_gp()
+            if(!typeId) {
+                authenticate()
                 .then(accessToken => {
+                    console.log(`token: ${accessToken}`)
                     loadSurveyQuestion(accessToken)
-                    loadSurveyWard(accessToken)
+                    if (surveyId) {
+                        loadSurveyWard(accessToken)
+                    }
                 })
                 .catch(err => {
                     setLoadError(true)
                     console.log(err)
                 })
+            } else if(typeId == 2) {
+                authenticate_gp()
+                .then(accessToken => {
+                    console.log(`token: ${accessToken}`)
+                    loadSurveyQuestion(accessToken)
+                    if (surveyId) {
+                        loadSurveyWard(accessToken)
+                    }
+                })
+                .catch(err => {
+                    setLoadError(true)
+                    console.log(err)
+                })
+            }
+            
         }
         return () => { isMounted = false }
     }, [])
 
-    console.log(watchForm.surveyResponse.rating? watchForm.surveyResponse.rating[8] : '')
+    //SURVEY TYPE SPECIFICS
+    useEffect(() => {
+        switch (typeId) {
+            case '1':
+                setSurveyName('Patient Experience Survey')
+                setSurveySubtitle(`Thinking about the recent inpatient admission in ${ward?.trimEnd()}, please complete this survey regarding your experience`)
+                break;
+            case '2':
+                setSurveyName('GP Experience Survey')
+                setSurveySubtitle(`This survey is designed for GPs to provide feedback on the quality and timeliness of discharge summaries.`)
+                break;
+        
+            default:
+                setSurveyName('Patient Experience Survey')
+                setSurveySubtitle(`Thinking about the recent inpatient admission in ${ward?.trimEnd()}, please complete this survey regarding your experience`)
+                break;
+        }
+    }, [typeId])
+
+    // console.log(watchForm.surveyResponse.rating? watchForm.surveyResponse.rating[8] : '')
+    console.log(`surveyName: ${surveyName}`)
 
     return (
         <ThemeProvider theme={theme}>
@@ -361,7 +436,7 @@ function Survey() {
                         <Paper className={isTabletOrMobile? classes.mobilePaper : classes.paper} elevation={3}>
                             <div className={classes.formItem}>
                                 <Typography variant="h6">
-                                    <b>Patient Experience Survey</b>
+                                    <b>{surveyName}</b>
                                 </Typography>
                             </div>
                         </Paper>
@@ -370,7 +445,7 @@ function Survey() {
                             <Paper className={isTabletOrMobile? classes.mobilePaper : classes.paper} style={{ paddingTop: '10px', paddingBottom: '25px' }} elevation={3}>
                                 { confirmSuccess === false ? 
                                     <>
-                                        <Typography className={classes.formItem} style={{ marginLeft: '15px' }} variant="body2">  {`Thinking about the recent inpatient admission in ${ward.trimEnd()}, please complete this survey regarding your experience`} </Typography>
+                                        <Typography className={classes.formItem} style={{ marginLeft: '15px' }} variant="body2">  {surveySubtitle} </Typography>
                                         {
                                             surveyData.map((row, index) => {
                                                 if (row.status === "active"){
@@ -437,10 +512,10 @@ function Survey() {
                                                                                 <>
                                                                                 <Grid container direction="row" justify="space-between" alignItems="center">
                                                                                     <Grid item>
-                                                                                        <Typography variant="body2"> {row.ratings[0].title} </Typography>
+                                                                                        <Typography variant="body2"> {row.ratings?.[0]?.title} </Typography>
                                                                                     </Grid>
                                                                                     <Grid item>
-                                                                                        <Typography variant="body2"> {row.ratings[row.ratings.length - 1].title} </Typography>
+                                                                                        <Typography variant="body2"> {row.ratings?.[row.ratings.length - 1]?.title} </Typography>
                                                                                     </Grid>
                                                                                 </Grid>
                                                                                 {/* (1: Not at all likely, 2: Unlikely, 3: Neutral, 4: Likely, 5: Extremely likely) */}
@@ -476,7 +551,7 @@ function Survey() {
                                                                                                     props.onChange(value);
                                                                                                     }}
                                                                                                     valueLabelDisplay="auto"
-                                                                                                    max={row.ratings[row.ratings.length - 1].value}
+                                                                                                    max={row.ratings?.[row.ratings.length - 1]?.value}
                                                                                                     marks={marks}
                                                                                                 //   step={1}
                                                                                                 />
