@@ -339,6 +339,7 @@ function Survey() {
                 console.log(data)
                 if (data?.errors?.length > 0) throw new Error(data?.errors[0].message)
                 if (typeId == 2) {
+                    setSurveyId(data?.data?.survey_gp?.id)
                     setSurveyData(data?.data?.survey_gp?.templateSurvey.templateQuestions)
                 } else {
                     setSurveyData(data?.data?.survey?.templateSurvey.templateQuestions)
@@ -421,7 +422,7 @@ function Survey() {
                 setSurveySubtitle(`Thinking about the recent inpatient admission in ${ward?.trimEnd()}, please complete this survey regarding your experience`)
                 break;
         }
-    }, [typeId])
+    }, [typeId, ward])
 
     // console.log(watchForm.surveyResponse.rating? watchForm.surveyResponse.rating[8] : '')
     console.log(`surveyName: ${surveyName}`)
@@ -446,6 +447,7 @@ function Survey() {
                                 { confirmSuccess === false ? 
                                     <>
                                         <Typography className={classes.formItem} style={{ marginLeft: '15px' }} variant="body2">  {surveySubtitle} </Typography>
+                                        <Typography style={{ marginLeft: '15px' }} variant="body2"><i>By completing this survey you are consenting to Austin Health using the information you provide for quality improvement purposes </i></Typography>
                                         {
                                             surveyData.map((row, index) => {
                                                 if (row.status === "active"){
@@ -572,7 +574,7 @@ function Survey() {
                                             })
                                         } 
                                     </>:
-                                    <ThankYou/>
+                                    <ThankYou typeId={typeId}/>
                                 }
                             </Paper>
                             <div className="align__center">
@@ -589,7 +591,7 @@ function Survey() {
                         </Collapse> */}
 
                         <Collapse in={confirmError}>
-                            <Alert severity="error">
+                            <Alert style={{width:'100%'}} severity="error">
                                 <AlertTitle>Error</AlertTitle>
                                 Could not submit survey!
                             </Alert>
