@@ -446,8 +446,8 @@ function Survey() {
                             <Paper className={isTabletOrMobile? classes.mobilePaper : classes.paper} style={{ paddingTop: '10px', paddingBottom: '25px' }} elevation={3}>
                                 { confirmSuccess === false ? 
                                     <>
-                                        <Typography className={classes.formItem} style={{ marginLeft: '15px' }} variant="body2">  {surveySubtitle} </Typography>
                                         <Typography style={{ marginLeft: '15px' }} variant="body2"><i>By completing this survey you are consenting to Austin Health using the information you provide for quality improvement purposes </i></Typography>
+                                        <Typography className={classes.formItem} style={{ marginLeft: '15px' }} variant="body2">  {surveySubtitle} </Typography>
                                         {
                                             surveyData.map((row, index) => {
                                                 if (row.status === "active"){
