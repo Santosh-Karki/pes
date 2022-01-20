@@ -34,7 +34,7 @@ function Survey() {
 
     //VARIABLES
     const isTabletOrMobile = useMediaQuery({ query: '(max-width: 1224px)' })
-    const surveyUrl = process.env.REACT_APP_BACKEND_URL
+    const surveyUrl = 'https://ah-pes-backend.azurewebsites.net/graphql'
     // const surveyUrl = 'http://localhost:9000/graphql'
     let questNo = 0
 
@@ -413,7 +413,7 @@ function Survey() {
                 setSurveySubtitle(`Thinking about the recent inpatient admission in ${ward?.trimEnd()}, please complete this survey regarding your experience`)
                 break;
             case '2':
-                setSurveyName('GP Experience Survey')
+                setSurveyName('GP Discharge Summary Feedback')
                 setSurveySubtitle(`This survey is designed for GPs to provide feedback on the quality and timeliness of discharge summaries.`)
                 break;
         
@@ -555,6 +555,7 @@ function Survey() {
                                                                                                     valueLabelDisplay="auto"
                                                                                                     max={row.ratings?.[row.ratings.length - 1]?.value}
                                                                                                     marks={marks}
+                                                                                                    defaultValue={typeId === 1 || !typeId ? 7 : 0}
                                                                                                 //   step={1}
                                                                                                 />
                                                                                             )
