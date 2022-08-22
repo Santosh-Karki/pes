@@ -8,9 +8,9 @@
 }
 
 .mobile__header {
-    background-color: white;
+    background-color: black;
     display: flex;
-    align-items: center;
+    align-items: left;
     min-width: fit-content;
 }
 
